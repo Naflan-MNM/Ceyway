@@ -19,11 +19,11 @@ const LandingPage = ({ navigation }) => {
       <View style={styles.overlay}>
         <Text style={styles.title}>Welcome to CEYWAY</Text>
 
-        <View style={styles.pagination}>
+       {/*  <View style={styles.pagination}>
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
-        </View>
+        </View> */}
 
         <TouchableOpacity style={styles.button} onPress={GoToNextPage}>
           <Text style={styles.buttonText}>Next</Text>
