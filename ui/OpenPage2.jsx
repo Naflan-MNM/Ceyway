@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react
 import { StatusBar } from 'expo-status-bar';
 
 const OpenPage2 = ({navigation}) => {
+
   const GoToStartPage = () => {
     navigation.navigate('StartPage');
   };
@@ -51,10 +52,11 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: 20,
+    fontWeight: "bold",
     color: 'white',
     textAlign: 'center',
+    paddingBottom: 70,
     marginBottom: 20,
   },
   button: {
