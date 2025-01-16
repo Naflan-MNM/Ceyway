@@ -1,7 +1,7 @@
 import React,{ useState } from 'react';
 import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity,ImageBackground } from 'react-native';
 import SuggestionCard from '../components/SuggestionCard';
-import StartPage2 from './StartPage2';
+import MainStartPage from './MainStartPage';
 
 
 // StartPage Component
@@ -40,7 +40,7 @@ const StartPage = ({navigation}) => {
 
     // Check for specific search text and navigate
     if (text.toLowerCase() === 'jaffna') {
-      navigation.navigate('StartPage2'); // Navigate to StartPage2
+      navigation.navigate('MainStartPage');
     }
 
     // Filter suggestions based on search text

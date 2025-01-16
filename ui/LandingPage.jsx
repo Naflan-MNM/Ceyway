@@ -1,33 +1,30 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import { CeywayContext } from '../context/CeywayContext'; 
 
 const LandingPage = ({ navigation }) => {
+  const {data} = useContext(CeywayContext);
+
   const GoToNextPage = () => {
     navigation.navigate('OpenPage2');
   };
 
   return (
     <ImageBackground
-      source={require('../assets/images/bg2.jpg')} // Replace with the correct path to your image
+      source={require('../assets/images/bg2.jpg')}
       style={styles.background}
     >
-      <StatusBar 
-        backgroundColor="green" 
-        barStyle="light-content"
-      />
+      <StatusBar backgroundColor="green" barStyle="light-content" />
       <View style={styles.overlay}>
-        {/* Welcome Text */}
         <Text style={styles.title}>Welcome to CEYWAY</Text>
 
-        {/* Pagination Indicator */}
         <View style={styles.pagination}>
           <View style={[styles.dot, styles.activeDot]} />
           <View style={styles.dot} />
           <View style={styles.dot} />
         </View>
 
-        {/* Next Button */}
         <TouchableOpacity style={styles.button} onPress={GoToNextPage}>
           <Text style={styles.buttonText}>Next</Text>
         </TouchableOpacity>
@@ -69,10 +66,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: 'blue', // Change the active dot color here
+    backgroundColor: 'blue',
   },
   button: {
-    backgroundColor: '#4682B4', // Light blue button color
+    backgroundColor: '#4682B4',
     paddingVertical: 12,
     paddingHorizontal: 30,
     borderRadius: 20,
