@@ -4,18 +4,18 @@ import { NavigationContainer } from '@react-navigation/native';
 import LandingPage from './ui/LandingPage';
 import OpenPage2 from './ui/OpenPage2';
 import StartPage from './ui/StartPage';
-import StartPage2 from './ui/StartPage2';
 import MainStartPage from './ui/MainStartPage';
 import StoryPage from './ui/StoryPage';
 import SavePage from './ui/SavePage';
 import ProfilePage from './ui/ProfilePage';
+import CustomPlanePage from './ui/CustomPlanePage';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="MainStartPage">
+      <Stack.Navigator initialRouteName="LandingPage">
         <Stack.Screen
           name="LandingPage"
           component={LandingPage}
@@ -34,6 +34,11 @@ export default function App() {
         <Stack.Screen
           name="MainStartPage"
           component={MainStartPage}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="CustomPlanePage"
+          component={CustomPlanePage}
           options={{ headerShown: false }}
         />
         <Stack.Screen name="StoryPage" component={StoryPage} />
