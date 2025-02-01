@@ -18,16 +18,21 @@ const LandingPage = ({ navigation }) => {
       <StatusBar backgroundColor="green" barStyle="light-content" />
       <View style={styles.overlay}>
         <Text style={styles.title}>Welcome to CEYWAY</Text>
-
-       {/*  <View style={styles.pagination}>
-          <View style={[styles.dot, styles.activeDot]} />
-          <View style={styles.dot} />
-          <View style={styles.dot} />
-        </View> */}
-
-        <TouchableOpacity style={styles.button} onPress={GoToNextPage}>
-          <Text style={styles.buttonText}>Next</Text>
-        </TouchableOpacity>
+        <View style={{ backgroundColor: '#212843', padding: 15, borderRadius: 10, marginLeft: 20, marginRight: 20 }}>
+          <Text style={{ color: '#ccdbf1', fontSize: 20, fontWeight: 'bold',marginBottom:10}}>Discover Sri Lanka, Your Way!</Text>
+          <Text style={{ color: 'white', fontSize: 12}}>From breathtaking beaches to cultural wonders, Ceyway’s AI-powered travel planner makes it easy to explore the best of Sri Lanka. Let’s get started!</Text>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
+            <View style={styles.pagination}>
+              <View style={[styles.dot, styles.activeDot]} />
+              <View style={styles.dot} />
+              <View style={styles.dot} />
+            </View>
+            <TouchableOpacity style={styles.button} onPress={GoToNextPage}>
+          
+              <Text style={styles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -56,23 +61,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   dot: {
-    width: 8,
-    height: 8,
+    width: 4,
+    height: 4,
     borderRadius: 4,
-    backgroundColor: 'white',
-    marginHorizontal: 4,
+    backgroundColor: '#ccdbf1',
+    marginHorizontal: 2,
   },
   activeDot: {
-    backgroundColor: 'blue',
+    width: 15,
   },
   button: {
-    backgroundColor: '#4682B4',
+    backgroundColor: '#555de3',
     paddingVertical: 12,
     paddingHorizontal: 30,
-    borderRadius: 20,
+    borderRadius: 15,
     marginBottom: 20,
   },
   buttonText: {
