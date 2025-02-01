@@ -9,6 +9,7 @@ import StoryPage from './ui/StoryPage';
 import SavePage from './ui/SavePage';
 import ProfilePage from './ui/ProfilePage';
 import CustomPlanePage from './ui/CustomPlanePage';
+import OpenPage3 from './ui/OpenPage3';
 
 const Stack = createNativeStackNavigator();
 
@@ -44,6 +45,7 @@ export default function App() {
         <Stack.Screen name="StoryPage" component={StoryPage} />
         <Stack.Screen name="SavePage" component={SavePage} />
         <Stack.Screen name="ProfilePage" component={ProfilePage} />
+        <Stack.Screen name="OpenPage3" component={OpenPage3} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
