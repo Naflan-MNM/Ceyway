@@ -6,8 +6,8 @@ import FooterNavigation from '../components/FooterNavigation';
 const MainStartPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
-        <StartPage2 />
-      <View style={styles.footer}>
+        <StartPage2 navigation={navigation}/>
+        <View style={styles.footer}>
         <FooterNavigation navigation={navigation} />
       </View>
     </View>

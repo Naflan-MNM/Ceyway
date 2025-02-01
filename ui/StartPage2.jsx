@@ -3,9 +3,14 @@ import { SafeAreaView, FlatList, Text, StyleSheet,TouchableOpacity } from 'react
 import { CeywayContext } from '../context/CeywayContext';
 import RenderItem from '../components/RenderItem';
 
-const StartPage2 = () => {
-  const { jaffnaData, onTheWayData, LocationData,selectedItems,toggleSelection,heandleContinue } = useContext(CeywayContext);
+
+const StartPage2 = ({navigation}) => {
+  const { jaffnaData, onTheWayData,selectedItems,toggleSelection } = useContext(CeywayContext);
   
+  const heandleContinue = () => {
+    console.log(selectedItems);
+    navigation.navigate('CustomPlanePage');
+};
 
   return (
     <SafeAreaView style={styles.container}>

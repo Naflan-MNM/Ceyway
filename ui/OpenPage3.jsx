@@ -1,35 +1,33 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { CeywayContext } from '../context/CeywayContext'; 
 
-const LandingPage = ({ navigation }) => {
-  const {data} = useContext(CeywayContext);
+const OpenPage3 = ({navigation}) => {
 
-  const GoToNextPage = () => {
-    navigation.navigate('OpenPage2');
+  const GoToStartPage = () => {
+    navigation.navigate('StartPage');
   };
-
   return (
     <ImageBackground
-      source={require('../assets/images/bg2.jpg')}
+      source={require('../assets/images/wheretogo.jpg')}
       style={styles.background}
     >
-      <StatusBar backgroundColor="green" barStyle="light-content" />
+      <StatusBar 
+        backgroundColor="green" 
+        barStyle="light-content"
+      />
       <View style={styles.overlay}>
-        <Text style={styles.title}>Welcome to CEYWAY</Text>
-        <View style={{ backgroundColor: '#212843', padding: 15, borderRadius: 10, marginLeft: 20, marginRight: 20 }}>
-          <Text style={{ color: '#ccdbf1', fontSize: 20, fontWeight: 'bold',marginBottom:10}}>Discover Sri Lanka, Your Way!</Text>
-          <Text style={{ color: 'white', fontSize: 12}}>From breathtaking beaches to cultural wonders, Ceyway’s AI-powered travel planner makes it easy to explore the best of Sri Lanka. Let’s get started!</Text>
+       <View style={{ backgroundColor: '#212843', padding: 15, borderRadius: 10, marginLeft: 20, marginRight: 20 }}>
+          <Text style={{ color: '#ccdbf1', fontSize: 20, fontWeight: 'bold',marginBottom:10}}>Plan, Save, and Share!</Text>
+          <Text style={{ color: 'white', fontSize: 12}}>Save your trips and share them with friends. Let’s make travel more fun and memorable.</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
             <View style={styles.pagination}>
+              <View style={styles.dot} />
+              <View style={styles.dot} />
               <View style={[styles.dot, styles.activeDot]} />
-              <View style={styles.dot} />
-              <View style={styles.dot} />
             </View>
-            <TouchableOpacity style={styles.button} onPress={GoToNextPage}>
-          
-              <Text style={styles.buttonText}>Next</Text>
+            <TouchableOpacity style={styles.button}>
+              <Text style={styles.buttonText}>Get Started!</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -42,11 +40,11 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
     resizeMode: 'cover',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
   },
   overlay: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     alignItems: 'center',
     paddingVertical: 40,
   },
@@ -56,6 +54,14 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     marginTop: 50,
+  },
+  subtitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: 'white',
+    textAlign: 'center',
+    paddingBottom: 70,
+    marginBottom: 20,
   },
   pagination: {
     flexDirection: 'row',
@@ -87,4 +93,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LandingPage;
+export default OpenPage3;
