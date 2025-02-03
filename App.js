@@ -10,6 +10,8 @@ import SavePage from './ui/SavePage';
 import ProfilePage from './ui/ProfilePage';
 import CustomPlanePage from './ui/CustomPlanePage';
 import OpenPage3 from './ui/OpenPage3';
+import LoginPage from './ui/LoginPage';
+import SignupPage from './ui/SignupPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,6 +48,8 @@ export default function App() {
         <Stack.Screen name="SavePage" component={SavePage} />
         <Stack.Screen name="ProfilePage" component={ProfilePage} />
         <Stack.Screen name="OpenPage3" component={OpenPage3} options={{ headerShown: false }} />
+        <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown: false }} />
+        <Stack.Screen name="SignupPage" component={SignupPage} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
