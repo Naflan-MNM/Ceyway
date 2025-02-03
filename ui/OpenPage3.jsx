@@ -1,11 +1,12 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
+import LoginPage from './LoginPage';
 
 const OpenPage3 = ({navigation}) => {
 
   const GoToStartPage = () => {
-    navigation.navigate('StartPage');
+    navigation.navigate('LoginPage');
   };
   return (
     <ImageBackground
@@ -26,7 +27,7 @@ const OpenPage3 = ({navigation}) => {
               <View style={styles.dot} />
               <View style={[styles.dot, styles.activeDot]} />
             </View>
-            <TouchableOpacity style={styles.button}>
+            <TouchableOpacity style={styles.button} onPress={GoToStartPage}>
               <Text style={styles.buttonText}>Get Started!</Text>
             </TouchableOpacity>
           </View>

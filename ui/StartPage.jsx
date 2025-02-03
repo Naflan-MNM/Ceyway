@@ -1,14 +1,13 @@
-import React,{ useState } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity,ImageBackground } from 'react-native';
-import SuggestionCard from '../components/SuggestionCard';
-import MainStartPage from './MainStartPage';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Image, StatusBar } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import FooterNavigation from '../components/FooterNavigation';
 
+const StartPage = ({ navigation }) => {
+  const [currentLocation, setCurrentLocation] = useState('');
+  const [destination, setDestination] = useState('');
 
-// StartPage Component
-const StartPage = ({navigation}) => {
-    
-  const [searchText, setSearchText] = useState('');
-  const [suggestions, setSuggestions] = useState([ // Sample data for the suggestions section 
+  const trendingDestinations = [
     {
       id: '1',
       title: 'Ella Sri Lanka',
@@ -33,114 +32,136 @@ const StartPage = ({navigation}) => {
       description: 'Find serenity in the misty peaks of the Knuckles Range.',
       image: require('../assets/images/knuckles.jpg'),  
     },
-  ]);
 
-  const handleSearch = (text) => {
-    setSearchText(text);
-
-    // Check for specific search text and navigate
-    if (text.toLowerCase() === 'jaffna') {
-      navigation.navigate('MainStartPage');
-    }
-
-    // Filter suggestions based on search text
-    const filteredSuggestions = suggestions.filter((suggestion) =>
-      suggestion.title.toLowerCase().includes(text.toLowerCase())
-    );
-    setSuggestions(filteredSuggestions);
-  };
+  ];
 
   return (
-    <ImageBackground
-          source={require('../assets/images/wheretogo.jpg')}
-          style={styles.background}
-    >
-      <View >
-      {/* Header Section */}
+    <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
+
+      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerText}>Where To Go</Text>
+        <Text style={styles.headerText}>Where do you want to go?</Text>
       </View>
 
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          placeholderTextColor="#888"
-          onChangeText={handleSearch}
-        />
-        <TouchableOpacity style={styles.searchIcon}>
-          <Text>🔍</Text>
+      {/* Location Inputs */}
+      <View style={styles.inputContainer}>
+        <View style={styles.inputBox}>
+          <Ionicons name="location-outline" size={20} color="#888" />
+          <TextInput
+            style={styles.input}
+            placeholder="Your location"
+            placeholderTextColor="#888"
+            value={currentLocation}
+            onChangeText={setCurrentLocation}
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <Ionicons name="navigate-outline" size={20} color="#888" />
+          <TextInput
+            style={styles.input}
+            placeholder="Where to go?"
+            placeholderTextColor="#888"
+            value={destination}
+            onChangeText={setDestination}
+          />
+        </View>
+        <TouchableOpacity style={styles.findButton}>
+          <Text style={styles.findButtonText}>Find Destinations</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Suggestions Section */}
+      {/* Trending Destinations Section */}
+      <Text style={styles.sectionTitle}>Explore Trending Destinations in Sri Lanka</Text>
       <FlatList
-        data={suggestions}
-        renderItem={({ item }) => <SuggestionCard data={item} />}
+        data={trendingDestinations}
+        vertical
         keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.suggestionsContainer}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            <Image source={item.image} style={styles.cardImage} />
+            <View style={styles.cardContent}>
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              <Text style={styles.cardDescription}>{item.description}</Text>
+            </View>
+          </View>
+        )}
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.cardList}
       />
+
+      <FooterNavigation navigation={navigation} />
     </View>
-    </ImageBackground>
-    
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    resizeMode: 'cover',
-    justifyContent: 'center',
+    backgroundColor: '#1A1A2E',
   },
   header: {
-    padding: 30,
+    marginTop: 40,
     alignItems: 'center',
-    elevation: 3,
   },
   headerText: {
-    fontSize: 26,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#fff',
   },
-  searchContainer: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
-    margin: 15,
-    borderRadius: 10,
-    elevation: 2,
-    alignItems: 'center',
-    paddingHorizontal: 10,
+  inputContainer: {
+    padding: 15,
   },
-  searchInput: {
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 10,
+  },
+  input: {
     flex: 1,
     height: 40,
     fontSize: 16,
     color: '#333',
+    marginLeft: 10,
   },
-  searchIcon: {
-    paddingHorizontal: 10,
+  findButton: {
+    backgroundColor: '#6C63FF',
+    borderRadius: 8,
+    alignItems: 'center',
+    padding: 10,
+    marginTop: 10,
   },
-  suggestionsContainer: {
-    paddingHorizontal: 15,
+  findButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sectionTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 15,
+    marginVertical: 10,
+  },
+  cardList: {
+    paddingLeft: 15,
+    paddingRight: 15,
+    gap: 15,
   },
   card: {
-    flexDirection: 'row',
     backgroundColor: '#fff',
-    marginVertical: 10,
     borderRadius: 10,
-    elevation: 3,
     overflow: 'hidden',
+    width: '100%',
   },
   cardImage: {
-    width: 100,
-    height: 100,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    width: '100%',
+    height: 120,
   },
   cardContent: {
-    flex: 1,
     padding: 10,
   },
   cardTitle: {

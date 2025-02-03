@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
+import { StyleSheet, View, Text, TouchableOpacity, ImageBackground,StatusBar } from 'react-native';
 import { CeywayContext } from '../context/CeywayContext'; 
 
 const LandingPage = ({ navigation }) => {
