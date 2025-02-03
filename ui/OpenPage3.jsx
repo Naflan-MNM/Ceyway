@@ -9,7 +9,7 @@ const OpenPage3 = ({navigation}) => {
     navigation.navigate('LoginPage');
   };
   return (
-    <ImageBackground
+    <ImageBackground 
       source={require('../assets/images/wheretogo.jpg')}
       style={styles.background}
     >
