@@ -1,66 +1,108 @@
 import React, { useContext, useState } from 'react';
-import { SafeAreaView, FlatList, Text, StyleSheet,TouchableOpacity } from 'react-native';
+import {
+  SafeAreaView,
+  FlatList,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { CeywayContext } from '../context/CeywayContext';
 import RenderItem from '../components/RenderItem';
 
+const StartPage2 = ({ navigation }) => {
+  const { jaffnaData, onTheWayData, selectedItems, toggleSelection } = useContext(CeywayContext);
+  const [activeTab, setActiveTab] = useState('Destinations');
 
-const StartPage2 = ({navigation}) => {
-  const { jaffnaData, onTheWayData,selectedItems,toggleSelection } = useContext(CeywayContext);
-  
-  const heandleContinue = () => {
+
+  const handleNext = () => {
     console.log(selectedItems);
-    navigation.navigate('CustomPlanePage');
-};
+    navigation.navigate('MembersDateVehicleScreen');
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.heading}>Jaffna</Text>
+      <Text style={styles.title}>Destinations</Text>
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'Destinations' && styles.activeTab]}
+          onPress={() => setActiveTab('Destinations')}
+        >
+          <Text style={activeTab === 'Destinations' ? styles.activeTabText : styles.tabText}>
+            Destinations
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'OnTheWay' && styles.activeTab]}
+          onPress={() => setActiveTab('OnTheWay')}
+        >
+          <Text style={activeTab === 'OnTheWay' ? styles.activeTabText : styles.tabText}>
+            On The Way
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <Text style={styles.selectionText}>{selectedItems.length} destinations selected. (Select destinations)</Text>
+      
       <FlatList
-        data={jaffnaData}
+        data={activeTab === 'Destinations' ? jaffnaData : onTheWayData}
         renderItem={({ item }) => (
-          <RenderItem
-            item={item}
-          />
+          <RenderItem item={item} selectedItems={selectedItems} toggleSelection={toggleSelection} />
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         showsVerticalScrollIndicator={false}
       />
 
-      <Text style={styles.heading}>On the way to Jaffna</Text>
-      <FlatList
-        data={onTheWayData}
-        renderItem={({ item }) => (
-          <RenderItem
-            item={item}
-            selectedItems={selectedItems}
-            toggleSelection={toggleSelection}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-      />
-       <TouchableOpacity style={styles.button} onPress={heandleContinue}>
-        <Text style={styles.buttonText}>Continue</Text>
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
+        <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
     </SafeAreaView>
-    
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#11132A',
     padding: 16,
   },
-  heading: {
-    fontSize: 18,
+  title: {
+    color: '#fff',
+    fontSize: 20,
     fontWeight: 'bold',
-    marginVertical: 12,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#2A2D48',
+    borderRadius: 10,
+    padding: 4,
+    marginBottom: 12,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  activeTab: {
+    backgroundColor: '#5566FF',
+  },
+  activeTabText: {
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  tabText: {
+    color: '#B0B3D6',
+  },
+  selectionText: {
+    color: '#B0B3D6',
+    fontSize: 14,
+    marginBottom: 10,
   },
   button: {
     marginTop: 16,
-    backgroundColor: '#007BFF',
+    backgroundColor: '#5566FF',
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',

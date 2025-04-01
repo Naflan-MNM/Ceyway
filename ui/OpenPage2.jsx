@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import OpenPage3 from './OpenPage3';
 
 const OpenPage2 = ({navigation}) => {
 

@@ -12,6 +12,15 @@ import CustomPlanePage from './ui/CustomPlanePage';
 import OpenPage3 from './ui/OpenPage3';
 import LoginPage from './ui/LoginPage';
 import SignupPage from './ui/SignupPage';
+import StartPage2 from './ui/StartPage2';
+import MembersDateVehicleScreen from './ui/MembersDateVehicleScreen';
+
+
+
+
+
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +59,8 @@ export default function App() {
         <Stack.Screen name="OpenPage3" component={OpenPage3} options={{ headerShown: false }} />
         <Stack.Screen name="LoginPage" component={LoginPage} options={{ headerShown: false }} />
         <Stack.Screen name="SignupPage" component={SignupPage} options={{ headerShown: false }} />
+        <Stack.Screen name="StartPage2" component={StartPage2} options={{ headerShown: false }} />
+        <Stack.Screen name="MembersDateVehicleScreen" component={MembersDateVehicleScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
