@@ -1,7 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, ImageBackground } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import LoginPage from './LoginPage';
 
 const OpenPage3 = ({navigation}) => {
 
@@ -9,7 +8,7 @@ const OpenPage3 = ({navigation}) => {
     navigation.navigate('LoginPage');
   };
   return (
-    <ImageBackground
+    <ImageBackground 
       source={require('../assets/images/wheretogo.jpg')}
       style={styles.background}
     >

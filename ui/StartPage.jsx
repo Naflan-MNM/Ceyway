@@ -7,6 +7,9 @@ const StartPage = ({ navigation }) => {
   const [currentLocation, setCurrentLocation] = useState('');
   const [destination, setDestination] = useState('');
 
+  const GoToStartPage2 = () => {
+    navigation.navigate('DestinationsScreen');
+  };
   const trendingDestinations = [
     {
       id: '1',
@@ -67,7 +70,7 @@ const StartPage = ({ navigation }) => {
           />
         </View>
         <TouchableOpacity style={styles.findButton}>
-          <Text style={styles.findButtonText}>Find Destinations</Text>
+          <Text style={styles.findButtonText} onPress={GoToStartPage2}>Find Destinations</Text>
         </TouchableOpacity>
       </View>
 
