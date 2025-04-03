@@ -8,7 +8,7 @@ const StartPage = ({ navigation }) => {
   const [destination, setDestination] = useState('');
 
   const GoToStartPage2 = () => {
-    navigation.navigate('StartPage2');
+    navigation.navigate('DestinationsScreen');
   };
   const trendingDestinations = [
     {

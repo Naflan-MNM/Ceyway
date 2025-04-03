@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   SafeAreaView,
   View,
@@ -9,24 +9,33 @@ import {
 } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
+import { CeywayContext } from '../context/CeywayContext';
 
 const MembersDateVehicleScreen = ({ navigation }) => {
-  const [adults, setAdults] = useState(2);
-  const [children, setChildren] = useState(1);
-  const [members, setMembers] = useState(`${adults} Adults, ${children} Children`);
-  const [modalVisible, setModalVisible] = useState(false);
+  const{adults,children,vehicle,fromDate,toDate,setAdults,setChildren,setVehicle,setFromDate,setToDate,members, setMembers} = useContext(CeywayContext)
+  
+  const [memberModalVisible, setmemberModalVisible] = useState(false);
   const [vehicleModalVisible, setVehicleModalVisible] = useState(false);
-  const [vehicle, setVehicle] = useState('Car');
   const [dateModalVisible, setDateModalVisible] = useState(false);
   const [selectedDates, setSelectedDates] = useState({});
-  const [fromDate, setFromDate] = useState(null);
-  const [toDate, setToDate] = useState(null);
 
   const handleDayPress = (day) => {
+    let today = new Date().toISOString().split('T')[0];
+    
     if (!fromDate || (fromDate && toDate)) {
       setFromDate(day.dateString);
       setToDate(null);
-      setSelectedDates({ [day.dateString]: { selected: true, startingDay: true, color: '#5566FF' } });
+      let newSelected = { 
+        [day.dateString]: { selected: true, startingDay: true, color: '#5566FF' } 
+      };
+  
+      // Ensure today's date is always highlighted
+      if (today !== day.dateString) {
+        newSelected[today] = { marked: true, dotColor: 'red' };
+      }
+  
+      setSelectedDates(newSelected);
     } else if (!toDate) {
       if (new Date(day.dateString) < new Date(fromDate)) {
         setToDate(fromDate);
@@ -34,20 +43,35 @@ const MembersDateVehicleScreen = ({ navigation }) => {
       } else {
         setToDate(day.dateString);
       }
+      
       let newSelected = {};
       let start = new Date(fromDate);
       let end = new Date(day.dateString);
+      
       for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
         let dateStr = d.toISOString().split('T')[0];
         newSelected[dateStr] = { selected: true, color: '#5566FF' };
       }
+  
+      // Ensure today's date remains highlighted
+      if (!newSelected[today]) {
+        newSelected[today] = { marked: true, dotColor: 'red' };
+      }
+  
       setSelectedDates(newSelected);
     }
   };
+  
+  // Set initial selectedDates to include today's date
+  useEffect(() => {
+    let today = new Date().toISOString().split('T')[0];
+    setSelectedDates({ [today]: { marked: true, dotColor: 'red' } });
+  }, []);
+  
 
   const updateMembers = () => {
     setMembers(`${adults} Adults, ${children} Children`);
-    setModalVisible(false);
+    setmemberModalVisible(false);
   };
 
   const vehicles = [
@@ -59,14 +83,21 @@ const MembersDateVehicleScreen = ({ navigation }) => {
   ];
 
   const handleNext = () => {
+    console.log(`members: ${members}, vehicle: ${vehicle}, date: ${fromDate} - ${toDate}`);
     navigation.navigate('SummaryScreen');
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Members, Date & Vehicle</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Members, Date & Vehicle</Text>
+      </View>
       <View style={styles.card}>
-        <TouchableOpacity style={styles.inputBox} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={styles.inputBox} onPress={() => setmemberModalVisible(true)}>
           <FontAwesome5 name="user-friends" size={16} color="#6b7280" />
           <Text style={styles.inputText}>{members}</Text>
         </TouchableOpacity>
@@ -87,22 +118,52 @@ const MembersDateVehicleScreen = ({ navigation }) => {
       </TouchableOpacity>
 
       {/* Members Modal */}
-      <Modal visible={modalVisible} transparent animationType="slide">
+      <Modal visible={memberModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Select Members</Text>
+
+            {/* Adults Counter */}
             <View style={styles.memberRow}>
               <Text style={styles.memberLabel}>Adults</Text>
-              <TouchableOpacity onPress={() => setAdults(Math.max(adults - 1, 1))}><Text>-</Text></TouchableOpacity>
-              <Text>{adults}</Text>
-              <TouchableOpacity onPress={() => setAdults(adults + 1)}><Text>+</Text></TouchableOpacity>
+              <View style={styles.counterContainer}>
+                <TouchableOpacity 
+                  style={styles.counterButton} 
+                  onPress={() => setAdults(Math.max(adults - 1, 1))}
+                >
+                  <Text style={styles.counterText}>➖</Text>
+                </TouchableOpacity>
+                <Text style={styles.countText}>{adults}</Text>
+                <TouchableOpacity 
+                  style={styles.counterButton} 
+                  onPress={() => setAdults(adults + 1)}
+                >
+                  <Text style={styles.counterText}>➕</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
+            {/* Children Counter */}
             <View style={styles.memberRow}>
               <Text style={styles.memberLabel}>Children</Text>
-              <TouchableOpacity onPress={() => setChildren(Math.max(children - 1, 0))}><Text>-</Text></TouchableOpacity>
-              <Text>{children}</Text>
-              <TouchableOpacity onPress={() => setChildren(children + 1)}><Text>+</Text></TouchableOpacity>
+              <View style={styles.counterContainer}>
+                <TouchableOpacity 
+                  style={styles.counterButton} 
+                  onPress={() => setChildren(Math.max(children - 1, 0))}
+                >
+                  <Text style={styles.counterText}>➖</Text>
+                </TouchableOpacity>
+                <Text style={styles.countText}>{children}</Text>
+                <TouchableOpacity 
+                  style={styles.counterButton} 
+                  onPress={() => setChildren(children + 1)}
+                >
+                  <Text style={styles.counterText}>➕</Text>
+                </TouchableOpacity>
+              </View>
             </View>
+
+            {/* Done Button */}
             <TouchableOpacity style={styles.doneButton} onPress={updateMembers}>
               <Text style={styles.buttonText}>Done</Text>
             </TouchableOpacity>
@@ -126,7 +187,7 @@ const MembersDateVehicleScreen = ({ navigation }) => {
        <Modal visible={vehicleModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Popup - Vehicle</Text>
+            <Text style={styles.modalTitle}>Choose Vehicle</Text>
             <View style={styles.vehicleGrid}>
               {vehicles.map((item) => (
                 <TouchableOpacity
@@ -134,7 +195,6 @@ const MembersDateVehicleScreen = ({ navigation }) => {
                   style={[styles.vehicleButton, vehicle === item.name && styles.selectedVehicle]}
                   onPress={() => {
                     setVehicle(item.name);
-                    setVehicleModalVisible(false);
                   }}
                 >
                   <FontAwesome5 name={item.icon} size={40} color={vehicle === item.name ? "white" : "black"} />
@@ -154,7 +214,8 @@ const MembersDateVehicleScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#11132A', padding: 16 },
-  title: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom:10, marginTop:20 },
+  headerText: { color: 'white', fontSize: 20, fontWeight: 'bold', marginLeft: 10 },
   card: { backgroundColor: '#fff', borderRadius: 10, padding: 16 },
   inputBox: { flexDirection: 'row', alignItems: 'center', padding: 14, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, marginBottom: 12 },
   inputText: { marginLeft: 10, color: '#1f2937', fontSize: 16 },
@@ -176,16 +237,19 @@ const styles = StyleSheet.create({
   },
   memberRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    borderWidth: 1, 
+    borderColor: '#e5e7eb',
+    borderRadius: 10,
+    justifyContent:'space-between',
     alignItems: 'center',
     marginBottom: 10,
+    padding: 10, 
   },
   memberLabel: {
     fontSize: 16,
   },
   counterContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
   },
   counterButton: {
     fontSize: 18,

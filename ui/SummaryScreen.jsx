@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, TouchableOpacity, FlatList, Image, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { CeywayContext } from '../context/CeywayContext';
 
-const destinations = [
-  { id: '1', name: 'Sigiriya Rock Fortress', distance: '10km from Dambulla', time: 'Approx. 10min', image: 'https://example.com/sigiriya.jpg' },
-  { id: '2', name: 'Sigiriya Rock Fortress', distance: '10km from Dambulla', time: 'Approx. 10min', image: 'https://example.com/sigiriya.jpg' },
-  { id: '3', name: 'Sigiriya Rock Fortress', distance: '10km from Dambulla', time: 'Approx. 10min', image: 'https://example.com/sigiriya.jpg' },
-];
 
 const SummaryScreen = ({navigation}) => {
-    const handleCreatePlan = () => {
-        navigation.navigate('ProcessingScreen');
-    };
+  const {selectedItems,LocationData,fromDate,members,vehicle,toDate} = useContext(CeywayContext)
+
+  const destinations = LocationData.filter(location => selectedItems.includes(location.id));
+  const handleCreatePlan = () => {
+      navigation.navigate('ProcessingScreen');
+  };
+
+  const handleMemberEdit= ()=>{
+
+  }
+    
+  const handleSelectionEdit = ()=>{
+
+  }
+
+
 
   return (
     <View style={styles.container}>
@@ -27,29 +36,29 @@ const SummaryScreen = ({navigation}) => {
       <View style={styles.card}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>Members, Date & Vehicle</Text>
-          <TouchableOpacity><Text style={styles.editText}>Edit</Text></TouchableOpacity>
+          <TouchableOpacity onPress={handleMemberEdit}><Text style={styles.editText}>Edit</Text></TouchableOpacity>
         </View>
-        <Text style={styles.infoText}>👤 3 Adults</Text>
-        <Text style={styles.infoText}>🚗 Car</Text>
-        <Text style={styles.infoText}>📅 Fri 7 Feb - Sun 9 Feb</Text>
+        <Text style={styles.infoText}>👤 {members}</Text>
+        <Text style={styles.infoText}>🚗 {vehicle}</Text>
+        <Text style={styles.infoText}>📅 {fromDate} - {toDate}</Text>
       </View>
 
       {/* Selected Destinations */}
       <View style={styles.card}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>Selected destinations ({destinations.length})</Text>
-          <TouchableOpacity><Text style={styles.editText}>Edit</Text></TouchableOpacity>
+          <TouchableOpacity onPress={handleSelectionEdit}><Text style={styles.editText}>Edit</Text></TouchableOpacity>
         </View>
         <FlatList
           data={destinations}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.destinationCard}>
-              <Image source={{ uri: item.image }} style={styles.destinationImage} />
+              <Image source={item.image} style={styles.destinationImage} />
               <View>
-                <Text style={styles.destinationName}>{item.name}</Text>
+                <Text style={styles.destinationName}>{item.title}</Text>
                 <Text style={styles.destinationDetail}>• {item.distance}</Text>
-                <Text style={styles.destinationDetail}>• {item.time}</Text>
+                {/* <Text style={styles.destinationDetail}>• {item.time}</Text> */}
               </View>
             </View>
           )}
@@ -69,7 +78,7 @@ const SummaryScreen = ({navigation}) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#1E2640', padding: 20 },
-  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 10,marginTop:20 },
   headerText: { color: 'white', fontSize: 20, fontWeight: 'bold', marginLeft: 10 },
   card: { backgroundColor: 'white', borderRadius: 10, padding: 15, marginBottom: 15 },
   rowBetween: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },

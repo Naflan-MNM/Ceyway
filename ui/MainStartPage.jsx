@@ -1,12 +1,12 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import StartPage2 from './StartPage2';
+import DestinationsScreen from './DestinationsScreen';
 import FooterNavigation from '../components/FooterNavigation';
 
 const MainStartPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
-        <StartPage2 navigation={navigation}/>
+        <DestinationsScreen navigation={navigation}/>
         <View style={styles.footer}>
         <FooterNavigation navigation={navigation} />
       </View>
