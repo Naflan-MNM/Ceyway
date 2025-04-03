@@ -14,6 +14,8 @@ import LoginPage from './ui/LoginPage';
 import SignupPage from './ui/SignupPage';
 import StartPage2 from './ui/StartPage2';
 import MembersDateVehicleScreen from './ui/MembersDateVehicleScreen';
+import SummaryScreen from './ui/SummaryScreen';
+import ProcessingScreen from './ui/ProcessingScreen';
 
 
 
@@ -61,6 +63,8 @@ export default function App() {
         <Stack.Screen name="SignupPage" component={SignupPage} options={{ headerShown: false }} />
         <Stack.Screen name="StartPage2" component={StartPage2} options={{ headerShown: false }} />
         <Stack.Screen name="MembersDateVehicleScreen" component={MembersDateVehicleScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="SummaryScreen" component={SummaryScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
