@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
+import { Calendar } from 'react-native-calendars';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 
 const MembersDateVehicleScreen = ({ navigation }) => {
@@ -16,21 +16,32 @@ const MembersDateVehicleScreen = ({ navigation }) => {
   const [members, setMembers] = useState(`${adults} Adults, ${children} Children`);
   const [modalVisible, setModalVisible] = useState(false);
   const [vehicleModalVisible, setVehicleModalVisible] = useState(false);
-  const [date, setDate] = useState(new Date());
-  const [dateRange, setDateRange] = useState(date.toDateString());
   const [vehicle, setVehicle] = useState('Car');
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateModalVisible, setDateModalVisible] = useState(false);
+  const [selectedDates, setSelectedDates] = useState({});
+  const [fromDate, setFromDate] = useState(null);
+  const [toDate, setToDate] = useState(null);
 
-  const handleDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDate(selectedDate);
-      const formattedDate = selectedDate.toLocaleDateString('en-US', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short'
-      });
-      setDateRange(formattedDate);
+  const handleDayPress = (day) => {
+    if (!fromDate || (fromDate && toDate)) {
+      setFromDate(day.dateString);
+      setToDate(null);
+      setSelectedDates({ [day.dateString]: { selected: true, startingDay: true, color: '#5566FF' } });
+    } else if (!toDate) {
+      if (new Date(day.dateString) < new Date(fromDate)) {
+        setToDate(fromDate);
+        setFromDate(day.dateString);
+      } else {
+        setToDate(day.dateString);
+      }
+      let newSelected = {};
+      let start = new Date(fromDate);
+      let end = new Date(day.dateString);
+      for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
+        let dateStr = d.toISOString().split('T')[0];
+        newSelected[dateStr] = { selected: true, color: '#5566FF' };
+      }
+      setSelectedDates(newSelected);
     }
   };
 
@@ -47,6 +58,10 @@ const MembersDateVehicleScreen = ({ navigation }) => {
     { name: 'Bus', icon: 'bus' },
   ];
 
+  const handleNext = () => {
+    navigation.navigate('SummaryScreen');
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Members, Date & Vehicle</Text>
@@ -56,14 +71,10 @@ const MembersDateVehicleScreen = ({ navigation }) => {
           <Text style={styles.inputText}>{members}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.inputBox} onPress={() => setShowDatePicker(true)}>
+        <TouchableOpacity style={styles.inputBox} onPress={() => setDateModalVisible(true)}>
           <MaterialCommunityIcons name="calendar" size={16} color="#6b7280" />
-          <Text style={styles.inputText}>{dateRange}</Text>
+          <Text style={styles.inputText}>{fromDate ? `${fromDate} - ${toDate || '?'}` : 'Select Dates'}</Text>
         </TouchableOpacity>
-
-        {showDatePicker && (
-          <DateTimePicker value={date} mode="date" display="default" onChange={handleDateChange} />
-        )}
 
         <TouchableOpacity style={styles.inputBox} onPress={() => setVehicleModalVisible(true)}>
           <FontAwesome5 name="car" size={16} color="#6b7280" />
@@ -71,42 +82,27 @@ const MembersDateVehicleScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NextScreen')}>
+      <TouchableOpacity style={styles.button} onPress={handleNext}>
         <Text style={styles.buttonText}>Next</Text>
       </TouchableOpacity>
 
-      {/* Modal for Members Selection */}
+      {/* Members Modal */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Popup - Members</Text>
-            
+            <Text style={styles.modalTitle}>Select Members</Text>
             <View style={styles.memberRow}>
               <Text style={styles.memberLabel}>Adults</Text>
-              <View style={styles.counterContainer}>
-                <TouchableOpacity onPress={() => setAdults(adults + 1)}>
-                  <Text style={styles.counterButton}>+</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterText}>{adults}</Text>
-                <TouchableOpacity onPress={() => setAdults(Math.max(adults - 1, 0))}>
-                  <Text style={styles.counterButton}>-</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => setAdults(Math.max(adults - 1, 1))}><Text>-</Text></TouchableOpacity>
+              <Text>{adults}</Text>
+              <TouchableOpacity onPress={() => setAdults(adults + 1)}><Text>+</Text></TouchableOpacity>
             </View>
-
             <View style={styles.memberRow}>
               <Text style={styles.memberLabel}>Children</Text>
-              <View style={styles.counterContainer}>
-                <TouchableOpacity onPress={() => setChildren(children + 1)}>
-                  <Text style={styles.counterButton}>+</Text>
-                </TouchableOpacity>
-                <Text style={styles.counterText}>{children}</Text>
-                <TouchableOpacity onPress={() => setChildren(Math.max(children - 1, 0))}>
-                  <Text style={styles.counterButton}>-</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity onPress={() => setChildren(Math.max(children - 1, 0))}><Text>-</Text></TouchableOpacity>
+              <Text>{children}</Text>
+              <TouchableOpacity onPress={() => setChildren(children + 1)}><Text>+</Text></TouchableOpacity>
             </View>
-
             <TouchableOpacity style={styles.doneButton} onPress={updateMembers}>
               <Text style={styles.buttonText}>Done</Text>
             </TouchableOpacity>
@@ -114,8 +110,20 @@ const MembersDateVehicleScreen = ({ navigation }) => {
         </View>
       </Modal>
 
-      {/* Modal for Vehicle Selection */}
-      <Modal visible={vehicleModalVisible} transparent animationType="slide">
+      {/* Date Picker Modal */}
+      <Modal visible={dateModalVisible} transparent animationType="slide">
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Calendar markingType={'period'} markedDates={selectedDates} onDayPress={handleDayPress} />
+            <TouchableOpacity style={styles.doneButton} onPress={() => setDateModalVisible(false)}>
+              <Text style={styles.buttonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+
+       {/* Modal for Vehicle Selection */}
+       <Modal visible={vehicleModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Popup - Vehicle</Text>
@@ -145,60 +153,21 @@ const MembersDateVehicleScreen = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#11132A',
-    padding: 16,
-  },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 16,
-  },
-  inputBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    marginBottom: 12,
-  },
-  inputText: {
-    marginLeft: 10,
-    color: '#1f2937',
-    fontSize: 16,
-  },
-  button: {
+  container: { flex: 1, backgroundColor: '#11132A', padding: 16 },
+  title: { color: '#fff', fontSize: 20, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+  card: { backgroundColor: '#fff', borderRadius: 10, padding: 16 },
+  inputBox: { flexDirection: 'row', alignItems: 'center', padding: 14, borderWidth: 1, borderColor: '#e5e7eb', borderRadius: 8, marginBottom: 12 },
+  inputText: { marginLeft: 10, color: '#1f2937', fontSize: 16 },
+  button: { marginTop: 20, backgroundColor: '#5566FF', padding: 14, borderRadius: 8, alignItems: 'center' },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
+  modalContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
+  modalContent: { backgroundColor: '#fff', padding: 20, borderRadius: 10, width: '80%' },
+  doneButton: {
     marginTop: 20,
     backgroundColor: '#5566FF',
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
   },
   modalTitle: {
     fontSize: 18,
@@ -255,6 +224,7 @@ const styles = StyleSheet.create({
     color: '#1f2937',
     fontSize: 14,
   },
+
 });
 
 export default MembersDateVehicleScreen;
