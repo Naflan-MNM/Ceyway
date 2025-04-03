@@ -9,8 +9,9 @@ import {
 } from 'react-native';
 import { CeywayContext } from '../context/CeywayContext';
 import RenderItem from '../components/RenderItem';
+import { Ionicons } from '@expo/vector-icons';
 
-const StartPage2 = ({ navigation }) => {
+const DestinationsScreen = ({ navigation }) => {
   const { jaffnaData, onTheWayData, selectedItems, toggleSelection } = useContext(CeywayContext);
   const [activeTab, setActiveTab] = useState('Destinations');
 
@@ -22,7 +23,13 @@ const StartPage2 = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Destinations</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerText}>Destinations</Text>
+      </View>
       <View style={styles.tabContainer}>
         <TouchableOpacity
           style={[styles.tab, activeTab === 'Destinations' && styles.activeTab]}
@@ -65,13 +72,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#11132A',
     padding: 16,
   },
-  title: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom:10, marginTop:20 },
+  headerText: { color: 'white', fontSize: 20, fontWeight: 'bold', marginLeft: 10 },
   tabContainer: {
     flexDirection: 'row',
     backgroundColor: '#2A2D48',
@@ -114,4 +116,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default StartPage2;
+export default DestinationsScreen;
