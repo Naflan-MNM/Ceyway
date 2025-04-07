@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -10,12 +10,32 @@ import {
 import Icon from "react-native-vector-icons/FontAwesome";
 
 const LoginPage = ({navigation}) => {
+    const [loading, setLoading] = useState(false);
+
     const GoToSignuptPage = () => {
         navigation.navigate('SignupPage');
     };
+
+    /* note here after you connecting with the backend you have to comment this function (GoToStartPage)
+    and then recommant the handlelogin function and follow the commnet which i have wrote thorughout the code */
     const GoToStartPage =()=>{
         navigation.navigate('StartPage')
     }
+    /* const handleLogin = async () => {
+      try {
+        setLoading(true);
+        const location = "sri-lanka"; // you can replace this later with dynamic input
+        const response = await axios.get(`http://localhost:8080/api/travel-app/get-attractions/${location}`);
+        const trendingData = response.data;
+
+        navigation.navigate('StartPage', { trendingDestinations: trendingData });
+      } catch (error) {
+        console.error('Error fetching trending destinations:', error);
+        Alert.alert("Error", "Failed to fetch trending destinations.");
+      } finally {
+        setLoading(false);
+      }
+    }; */
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor="#1A1A2E" barStyle="light-content" />
@@ -39,6 +59,11 @@ const LoginPage = ({navigation}) => {
         <Text style={styles.forgotPasswordText}>Forgot password?</Text>
       </TouchableOpacity>
 
+    {/* here after replacing that above funcion you have replace this code into
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin} disabled={loading}>
+          <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Login'}</Text>
+        </TouchableOpacity>
+       */}
       <TouchableOpacity style={styles.loginButton} onPress={GoToStartPage}>
         <Text style={styles.loginButtonText}>Login</Text>
       </TouchableOpacity>

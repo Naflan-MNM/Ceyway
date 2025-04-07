@@ -2,6 +2,19 @@ import React from "react";
 import { View, Text, ActivityIndicator, TouchableOpacity, StyleSheet } from "react-native";
 
 const ProcessingScreen = ({ navigation }) => {
+  /* const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []); */
+ /* just for testing */
+ const handleCancel = () => {
+   /* navigation.goBack(); */
+   navigation.navigate('PlanByAIScreen');
+ };
     
   return (
     <View style={styles.container}>
@@ -10,7 +23,7 @@ const ProcessingScreen = ({ navigation }) => {
         <Text style={styles.thinkingText}>Thinking!</Text>
         <Text style={styles.subText}>Your plan will be created shortly.</Text>
       </View>
-      <TouchableOpacity style={styles.cancelButton} onPress={() => navigation.goBack()}>
+      <TouchableOpacity style={styles.cancelButton} onPress={handleCancel}>
         <Text style={styles.cancelText}>Cancel</Text>
       </TouchableOpacity>
     </View>
