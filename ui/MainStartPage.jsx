@@ -3,6 +3,87 @@ import { View, StyleSheet } from 'react-native';
 import DestinationsScreen from './DestinationsScreen';
 import FooterNavigation from '../components/FooterNavigation';
 
+
+
+
+/* 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+not in use not in use
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ */
 const MainStartPage = ({ navigation }) => {
   return (
     <View style={styles.container}>

@@ -5,6 +5,69 @@ import CustomPageHeader from '../components/CustomPageHeader';
 import ItemCard from '../components/ItemCard';
 import FooterNavigation from '../components/FooterNavigation';
 
+/*                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+no in use 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
 const CustomPlanePage = ({ navigation }) => {
     const { jaffnaData, selectedItems, toggleSelection } = useContext(CeywayContext);
 

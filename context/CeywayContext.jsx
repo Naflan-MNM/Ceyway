@@ -49,8 +49,10 @@ const CeywayContextProvider = (props) => {
     const [toDate, setToDate] = useState(null);//handle the to date
     
 
-
-    
+    /* const [jaffnaData, setJaffnaData] = useState([]);
+      const [onTheWayData, setOnTheWayData] = useState([]); 
+    */
+      
     
     // Filter the LocationData into two arrays: Jaffna and On the way
     const jaffnaData = LocationData.filter(item => item.location === 'Jaffna');

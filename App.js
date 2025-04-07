@@ -16,6 +16,7 @@ import DestinationsScreen from './ui/DestinationsScreen';
 import MembersDateVehicleScreen from './ui/MembersDateVehicleScreen';
 import SummaryScreen from './ui/SummaryScreen';
 import ProcessingScreen from './ui/ProcessingScreen';
+import PlanByAIScreen from './ui/PlanByAIScreen';
 
 
 
@@ -65,6 +66,7 @@ export default function App() {
         <Stack.Screen name="MembersDateVehicleScreen" component={MembersDateVehicleScreen} options={{ headerShown: false }} />
         <Stack.Screen name="SummaryScreen" component={SummaryScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ProcessingScreen" component={ProcessingScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PlanByAIScreen" component={PlanByAIScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
