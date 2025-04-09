@@ -11,9 +11,9 @@ const RenderItem = ({ item }) => {
     <View style={styles.card}>
       <Image source={item.image} style={styles.image} />
       <View style={styles.infoContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.location}>{item.location}</Text>
-        <Text style={styles.distance}>{item.distance}</Text>
+        <Text style={styles.title}>{item.name}</Text>
+        <Text style={styles.location}>{item.district}</Text>
+        <Text style={styles.distance}>{item.category}</Text>
       </View>
       <CheckBox
         checked={selectedItems.includes(item.id)} // Use 'checked' with a boolean value

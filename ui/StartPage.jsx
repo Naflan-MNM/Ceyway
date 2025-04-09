@@ -1,67 +1,40 @@
-import React, { useState,useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Image, StatusBar } from 'react-native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import FooterNavigation from '../components/FooterNavigation';
 import { CeywayContext } from '../context/CeywayContext';
 
-const StartPage = ({ navigation, route  }) => {
-
+const StartPage = ({ navigation }) => {
   const { setJaffnaData, setOnTheWayData } = useContext(CeywayContext);
 
   const [currentLocation, setCurrentLocation] = useState('');
   const [destination, setDestination] = useState('');
-/* ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-  /* if you complete the setup of trending destinatinos then follow this
-  but it not mendatory to compmlete those setup to do this */
-  /* this setup requesting destinatin, on the way destinations  */
 
-  const GoToStartPage2 = () => {
-    navigation.navigate('DestinationsScreen');
+  // ✅ Replace this with your machine's local IP address (same Wi-Fi as mobile)
+  const LOCAL_IP = '10.0.2.2';//or 192.168.43.53 // <<<<< REPLACE THIS IP
+
+  const GoToStartPage2 = async () => {
+    if (!currentLocation || !destination) return; 
+
+    try {
+      const destinationRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${destination}`);
+      if (!destinationRes.ok) throw new Error('Destination fetch failed');
+      const destinationData = await destinationRes.json();
+
+      const onTheWayRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/${currentLocation}/${destination}`);
+      if (!onTheWayRes.ok) throw new Error('On-the-way fetch failed');
+      const onTheWayData = await onTheWayRes.json();
+
+      setJaffnaData(destinationData);
+      setOnTheWayData(onTheWayData);
+
+      navigation.navigate('DestinationsScreen');
+    } catch (err) {
+      console.error('Failed to fetch travel data:', err);
+      Alert.alert('Error', 'Unable to fetch travel data. Please try again later.');
+    }
   };
 
-  /* 
-  here this function for reqesting destinations and onthe way destinations
-  after uncomment this you have to comment above function and then gotothe ceywayContext.jsx file and uncomment the 
-  const [jaffnaData, setJaffnaData] = useState([]);
-  const [onTheWayData, setOnTheWayData] = useState([]);
-  this 2 state and comment the filter logic of the jaffnaData and onTheWayData
-
-   */
-/* 
-
-const GoToStartPage2 = async () => {
-  if (!currentLocation || !destination) return;
-
-  try {
-    // Fetch destination attractions
-    const destinationRes = await fetch(`http://localhost:8080/api/travel-app/get-attractions/${destination}`);
-    const destinationData = await destinationRes.json();
-
-    // Fetch on-the-way attractions
-    const onTheWayRes = await fetch(`http://localhost:8080/api/travel-app/get-ontheway-attractions/${currentLocation}/${destination}`);
-    const onTheWayData = await onTheWayRes.json();
-
-    // Set in context
-    setJaffnaData(destinationData);
-    setOnTheWayData(onTheWayData);
-
-    navigation.navigate('DestinationsScreen');
-  } catch (err) {
-    console.error('Failed to fetch travel data:', err);
-  }
-}; */
-
-/* --------------------------------------------------------ending the setup of requesting ontheway , destinations location information -------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-
-/* ----------------------------------------------starting the section for handling the setup of trending destinations -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
-
-  /* after completing the setup of login page then you have to uncomment this, and comment mokedata*/
-  /* const trendingDestinations = route.params?.trendingDestinations || []; */
-
-  /* Additional Note:
-      Make sure your backend returns the image as a URL, not a static file path. If you're sending image paths, your mobile app won't display them unless you host them correctly (e.g., http://localhost:8080/images/ella.jpg).
-  */
   const trendingDestinations = [
     {
       id: '1',
@@ -88,7 +61,6 @@ const GoToStartPage2 = async () => {
       image: require('../assets/images/knuckles.jpg'),
     },
   ];
-  /* -------------------------------------------ending the setup for handling trending destinations ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- */
 
   return (
     <View style={styles.container}>
@@ -125,8 +97,8 @@ const GoToStartPage2 = async () => {
           />
         </View>
 
-        <TouchableOpacity style={styles.findButton}>
-          <Text style={styles.findButtonText} onPress={GoToStartPage2}>Find Destinations</Text>
+        <TouchableOpacity style={styles.findButton} onPress={GoToStartPage2}>
+          <Text style={styles.findButtonText}>Find Destinations</Text>
         </TouchableOpacity>
       </View>
 
@@ -134,7 +106,6 @@ const GoToStartPage2 = async () => {
       <Text style={styles.sectionTitle}>Explore Trending Destinations in Sri Lanka</Text>
       <FlatList
         data={trendingDestinations}
-        vertical
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.card}>
@@ -222,6 +193,12 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     overflow: 'hidden',
     width: '100%',
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
   },
   cardImage: {
     width: '100%',
