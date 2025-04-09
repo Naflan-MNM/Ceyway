@@ -4,13 +4,58 @@ import { Ionicons } from '@expo/vector-icons';
 import { CeywayContext } from '../context/CeywayContext';
 
 const SummaryScreen = ({ navigation }) => {
-  const { selectedItems, LocationData, fromDate, members, vehicle, toDate } = useContext(CeywayContext);
+  const {
+    selectedItems,
+    jaffnaData,
+    onTheWayData,
+    fromDate,
+    toDate,
+    members,
+    vehicle
+  } = useContext(CeywayContext);
 
-  const destinations = LocationData.filter(location => selectedItems.includes(location.id));
+  const destinations = jaffnaData.filter(location => selectedItems.includes(Number(location.id)));
+  const onTheWayDestinations = onTheWayData.filter(location => selectedItems.includes(Number(location.id)));
 
-  const handleCreatePlan = () => {
+  console.log('Filtered Destinations:', destinations);
+  console.log('Filtered OnTheWayDestinations:', onTheWayDestinations);
+  
+
+
+  /* const handleCreatePlan = () => {
     navigation.navigate('ProcessingScreen');
-  };
+  }; */
+  const handleCreatePlan = async () => {
+  // Navigate to processing screen first
+  navigation.navigate('ProcessingScreen');
+
+  try {
+    const response = await fetch('http://10.0.2.2:8080/api/travel-app/generate-trip-plan', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        members: members,
+        vehicle: vehicle,
+        dates: {
+          start: fromDate,
+          end: toDate,
+        }
+      }),
+    });
+
+    const data = await response.json();
+
+    // Add slight delay to simulate processing screen (optional)
+    setTimeout(() => {
+      navigation.replace('PlanByAIScreen', { planData: data });
+    }, 1500);
+  } catch (error) {
+    console.error('Error creating plan:', error);
+    // Optionally show error or retry option
+  }
+}; 
 
   const handleMemberEdit = () => {};
   const handleSelectionEdit = () => {};
@@ -25,7 +70,7 @@ const SummaryScreen = ({ navigation }) => {
         <Text style={styles.headerText}>Summary</Text>
       </View>
 
-      {/* Fixed Members, Date & Vehicle summary */}
+      {/* Member, Date, Vehicle Info */}
       <View style={styles.card}>
         <View style={styles.rowBetween}>
           <Text style={styles.cardTitle}>Members, Date & Vehicle</Text>
@@ -38,28 +83,52 @@ const SummaryScreen = ({ navigation }) => {
         <Text style={styles.infoText}>📅 {fromDate} - {toDate}</Text>
       </View>
 
-      {/* Scrollable section */}
+      {/* Scrollable content */}
       <ScrollView contentContainerStyle={styles.scrollArea} showsVerticalScrollIndicator={false}>
-        {/* Selected Destinations */}
-        <View style={styles.card}>
-          <View style={styles.rowBetween}>
-            <Text style={styles.cardTitle}>Selected destinations ({destinations.length})</Text>
-            <TouchableOpacity onPress={handleSelectionEdit}>
-              <Text style={styles.editText}>Edit</Text>
-            </TouchableOpacity>
-          </View>
-          {destinations.map((item) => (
-            <View key={item.id} style={styles.destinationCard}>
-              <Image source={item.image} style={styles.destinationImage} />
-              <View>
-                <Text style={styles.destinationName}>{item.title}</Text>
-                <Text style={styles.destinationDetail}>• {item.distance}</Text>
-              </View>
-            </View>
-          ))}
-        </View>
 
-        {/* AI text */}
+        {/* Jaffna Destinations */}
+        {destinations.length > 0 && (
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.cardTitle}>Destinations ({destinations.length})</Text>
+              <TouchableOpacity onPress={handleSelectionEdit}>
+                <Text style={styles.editText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
+            {destinations.map((item) => (
+              <View key={item.id} style={styles.destinationCard}>
+                <Image source={item.image} style={styles.destinationImage} />
+                <View>
+                  <Text style={styles.destinationName}>{item.title}</Text>
+                  <Text style={styles.destinationDetail}>• {item.location}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* On the Way Destinations */}
+        {onTheWayDestinations.length > 0 && (
+          <View style={styles.card}>
+            <View style={styles.rowBetween}>
+              <Text style={styles.cardTitle}>On the Way Destinations ({onTheWayDestinations.length})</Text>
+              <TouchableOpacity onPress={handleSelectionEdit}>
+                <Text style={styles.editText}>Edit</Text>
+              </TouchableOpacity>
+            </View>
+            {onTheWayDestinations.map((item) => (
+              <View key={item.id} style={styles.destinationCard}>
+                <Image source={item.image} style={styles.destinationImage} />
+                <View>
+                  <Text style={styles.destinationName}>{item.title}</Text>
+                  <Text style={styles.destinationDetail}>• {item.location}</Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+
+        {/* AI Prompt */}
         <Text style={styles.aiText}>
           ✨ Let's process your details and create a perfect travel plan with our smart AI.
         </Text>
