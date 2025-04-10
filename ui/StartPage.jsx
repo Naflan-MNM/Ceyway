@@ -11,17 +11,17 @@ const StartPage = ({ navigation }) => {
   const [destination, setDestination] = useState('');
 
   // ✅ Replace this with your machine's local IP address (same Wi-Fi as mobile)
-  const LOCAL_IP = '10.0.2.2';//or 192.168.43.53 // <<<<< REPLACE THIS IP
+  const LOCAL_IP = '192.168.43.77';//or 192.168.43.53 // <<<<< REPLACE THIS IP
 
   const GoToStartPage2 = async () => {
-    if (!currentLocation || !destination) return; 
+    /* if (!currentLocation || !destination) return; */ 
 
     try {
-      const destinationRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${destination}`);
+      const destinationRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-attractions/Anuradhapura`);
       if (!destinationRes.ok) throw new Error('Destination fetch failed');
       const destinationData = await destinationRes.json();
 
-      const onTheWayRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/${currentLocation}/${destination}`);
+      const onTheWayRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/Trincomalee/Anuradhapura`);
       if (!onTheWayRes.ok) throw new Error('On-the-way fetch failed');
       const onTheWayData = await onTheWayRes.json();
 
