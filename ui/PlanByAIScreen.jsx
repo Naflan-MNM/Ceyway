@@ -1,46 +1,17 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { CeywayContext } from '../context/CeywayContext';
 
-const mockData = {
-  members: '3 Adults',
-  vehicle: 'Car',
-  dateRange: 'Fri 7 Feb - Sun 9 Feb',
-  plan: [
-    {
-      day: 'Day 1 - 21 Feb',
-      destinations: [
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg', // note we have to change this to our actual image url
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg',
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-      ],
-    },
-    {
-      day: 'Day 2 - 22 Feb',
-      destinations: [
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg',
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-      ],
-    },
-  ],
-};
 
-const PlanByAIScreen = ({ navigation  }) => {
+const PlanByAIScreen = ({ route, navigation }) => {
+  const {
+    fromDate,
+    toDate,
+    members,
+    vehicle,
+  } = useContext(CeywayContext);
+  const { planData } = route.params;
+  const {tripPlan} = planData.data;
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -50,22 +21,27 @@ const PlanByAIScreen = ({ navigation  }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Members, Date & Vehicle</Text>
-          <Text style={styles.text}>👤 {mockData.members}</Text>
-          <Text style={styles.text}>🚗 {mockData.vehicle}</Text>
-          <Text style={styles.text}>📅 {mockData.dateRange}</Text>
+          <Text style={styles.text}>👤 {members}</Text>
+          <Text style={styles.text}>🚗 {vehicle}</Text>
+          <Text style={styles.text}>📅 {fromDate} - {toDate}</Text>
         </View>
 
-        {mockData.plan.map((dayItem, index) => (
+        {/* Render each day of trip plan */}
+        {tripPlan?.days.map((dayItem, index) => (
           <View key={index}>
-            <Text style={styles.dayText}>{dayItem.day}</Text>
-            {dayItem.destinations.map((dest, idx) => (
+            <Text style={styles.dayText}>Day {index + 1} - {dayItem.date}</Text>
+            {dayItem.activities.map((activity, idx) => (
               <View key={idx} style={styles.destinationCard}>
-                <Image source={{ uri: dest.image }} style={styles.image} />
+                <Image
+                  source={{ uri: 'https://i.imgur.com/NjEdKbb.jpg' }} // or replace this with a dynamic or placeholder image url
+                  style={styles.image}
+                />
                 <View style={styles.destinationContent}>
-                  <Text style={styles.destinationTitle}>{dest.title}</Text>
-                  <Text style={styles.timeSlot}>{dest.timeSlot}</Text>
-                  <Text style={styles.destinationDetail}>• {dest.distance}</Text>
-                  <Text style={styles.destinationDetail}>• {dest.duration}</Text>
+                  <Text style={styles.destinationTitle}>{activity.place}</Text>
+                  <Text style={styles.timeSlot}>{activity.time}</Text>
+                  <Text style={styles.destinationDetail}>• Duration: {activity.duration}</Text>
+                  <Text style={styles.destinationDetail}>• Distance: {activity.distance}</Text>
+                  <Text style={styles.destinationDetail}>• Travel Time: {activity.travelTime}</Text>
                   <Text style={styles.linkText}>more details</Text>
                 </View>
               </View>
