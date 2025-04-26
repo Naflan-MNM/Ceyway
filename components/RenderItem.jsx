@@ -9,7 +9,7 @@ const RenderItem = ({ item }) => {
 
   return (
     <View style={styles.card}>
-      <Image source={item.image} style={styles.image} />
+      <Image source={item.imagePath} style={styles.image} />
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.location}>{item.district}</Text>
