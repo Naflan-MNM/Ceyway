@@ -5,6 +5,9 @@ export const CeywayContext = createContext();
 
 const CeywayContextProvider = (props) => {
 
+
+  const LOCAL_IP = '192.168.43.77'; //or 10.0.2.2 this is only work if you use android simulator not for your mobile device  // <<<<< REPLACE THIS IP
+
   
   const LocationData = [
     { id: '1', title: 'Nallur Kovil', location: 'Jaffna', distance: '4 km', 
@@ -51,13 +54,13 @@ const CeywayContextProvider = (props) => {
     const [toDate, setToDate] = useState(null);//handle the to date
     
 
-    const [jaffnaData, setJaffnaData] = useState([]);
+    const [destinationData, setdestinationData] = useState([]);
     const [onTheWayData, setOnTheWayData] = useState([]); 
    
       
     
     /* // Filter the LocationData into two arrays: Jaffna and On the way
-    const jaffnaData = LocationData.filter(item => item.location === 'Jaffna');
+    const destinationData = LocationData.filter(item => item.location === 'Jaffna');
     const onTheWayData = LocationData.filter(item => item.location === 'On the way'); */
     
     const toggleSelection = (itemId) => {
@@ -74,8 +77,8 @@ const CeywayContextProvider = (props) => {
    
         
     const value = {
-        LocationData,jaffnaData,onTheWayData,selectedItems,adults,toDate,fromDate,vehicle,children,members,
-        toggleSelection,setToDate,setFromDate,setVehicle,setChildren,setAdults,setMembers,setJaffnaData,setOnTheWayData
+        LocationData,destinationData,onTheWayData,selectedItems,adults,toDate,fromDate,vehicle,children,members,LOCAL_IP,
+        toggleSelection,setToDate,setFromDate,setVehicle,setChildren,setAdults,setMembers,setdestinationData,setOnTheWayData
     };
 
     return (
