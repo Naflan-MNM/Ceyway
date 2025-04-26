@@ -4,15 +4,12 @@ import { Ionicons } from '@expo/vector-icons';
 import FooterNavigation from '../components/FooterNavigation';
 import { CeywayContext } from '../context/CeywayContext';
 
+
 const StartPage = ({ navigation }) => {
-  const { setJaffnaData, setOnTheWayData } = useContext(CeywayContext);
+  const { setdestinationData, setOnTheWayData,LOCAL_IP } = useContext(CeywayContext);
 
   const [currentLocation, setCurrentLocation] = useState('');
   const [destination, setDestination] = useState('');
-
-  // ✅ Replace this with your machine's local IP address (same Wi-Fi as mobile)
-  const LOCAL_IP = '192.168.43.77';//or 192.168.43.53 // <<<<< REPLACE THIS IP
-
   const GoToStartPage2 = async () => {
     /* if (!currentLocation || !destination) return; */ 
 
@@ -25,7 +22,7 @@ const StartPage = ({ navigation }) => {
       if (!onTheWayRes.ok) throw new Error('On-the-way fetch failed');
       const onTheWayData = await onTheWayRes.json();
 
-      setJaffnaData(destinationData);
+      setdestinationData(destinationData);
       setOnTheWayData(onTheWayData);
 
       navigation.navigate('DestinationsScreen');
