@@ -6,15 +6,16 @@ import { CeywayContext } from '../context/CeywayContext';
 const SummaryScreen = ({ navigation }) => {
   const {
     selectedItems,
-    jaffnaData,
+    destinationData,
     onTheWayData,
     fromDate,
     toDate,
     members,
-    vehicle
+    vehicle,
+    LOCAL_IP
   } = useContext(CeywayContext);
 
-  const destinations = jaffnaData.filter(location => selectedItems.includes(Number(location.id)));
+  const destinations = destinationData.filter(location => selectedItems.includes(Number(location.id)));
   const onTheWayDestinations = onTheWayData.filter(location => selectedItems.includes(Number(location.id)));
 
   console.log('Filtered Destinations:', destinations);
@@ -26,27 +27,33 @@ const SummaryScreen = ({ navigation }) => {
     navigation.navigate('ProcessingScreen');
   }; */
   const handleCreatePlan = async () => {
-  // Navigate to processing screen first
-  navigation.navigate('ProcessingScreen');
+    const selectedAttractionsNames = destinations.map(item => item.name);
+    const selectedOnTheWayNames = onTheWayDestinations.map(item => item.name);
+    // Navigate to processing screen first
+    navigation.navigate('ProcessingScreen');
 
   try {
-    const response = await fetch('http://10.0.2.2:8080/api/travel-app/generate-trip-plan', {
+    const response = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/generate-trip-plan`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        members: members,
+        /* members: members,
         vehicle: vehicle,
         dates: {
           start: fromDate,
           end: toDate,
-        }
+        } */
+        start: "Anuradhapura",
+        destination: "Trincomalee",
+        selectedOnTheWay: selectedOnTheWayNames,
+        selectedAttractions: selectedAttractionsNames
       }),
     });
 
     const data = await response.json();
-
+    console.log(data);
     // Add slight delay to simulate processing screen (optional)
     setTimeout(() => {
       navigation.replace('PlanByAIScreen', { planData: data });
