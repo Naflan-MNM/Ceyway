@@ -12,20 +12,13 @@ const SummaryScreen = ({ navigation }) => {
     toDate,
     members,
     vehicle,
-    LOCAL_IP
+    LOCAL_IP,
+    setActiveTab,
   } = useContext(CeywayContext);
 
   const destinations = destinationData.filter(location => selectedItems.includes(Number(location.id)));
-  const onTheWayDestinations = onTheWayData.filter(location => selectedItems.includes(Number(location.id)));
-
-  console.log('Filtered Destinations:', destinations);
-  console.log('Filtered OnTheWayDestinations:', onTheWayDestinations);
+  const onTheWayDestinations = onTheWayData.filter(location => selectedItems.includes(Number(location.id)))
   
-
-
-  /* const handleCreatePlan = () => {
-    navigation.navigate('ProcessingScreen');
-  }; */
   const handleCreatePlan = async () => {
     const selectedAttractionsNames = destinations.map(item => item.name);
     const selectedOnTheWayNames = onTheWayDestinations.map(item => item.name);
@@ -47,16 +40,18 @@ const SummaryScreen = ({ navigation }) => {
         } */
         start: "Anuradhapura",
         destination: "Trincomalee",
-        selectedOnTheWay: selectedOnTheWayNames,
-        selectedAttractions: selectedAttractionsNames
+        selectedOnTheWay: ["Habarana", "Minneriya National Park"],
+        selectedAttractions: ["Marble Beach", "Duch bay beach ", "Lovers Leap", "Kanniya Hot Water Springs"]
+        /* selectedOnTheWay: selectedOnTheWayNames,
+        selectedAttractions: selectedAttractionsNames */
       }),
     });
 
-    const data = await response.json();
-    console.log(data);
+    const sheduleData = await response.json();
+    console.log(sheduleData);
     // Add slight delay to simulate processing screen (optional)
     setTimeout(() => {
-      navigation.replace('PlanByAIScreen', { planData: data });
+      navigation.replace('PlanByAIScreen', { planData: sheduleData });
     }, 1500);
   } catch (error) {
     console.error('Error creating plan:', error);
@@ -64,9 +59,17 @@ const SummaryScreen = ({ navigation }) => {
   }
 }; 
 
-  const handleMemberEdit = () => {};
-  const handleSelectionEdit = () => {};
-
+  const handleMemberEdit = () => {
+   navigation.goBack();
+  };
+  const handleDestinationEdit = () => {
+    setActiveTab('Destinations');
+    navigation.navigate('DestinationsScreen');
+  };
+  const handleOntheWayEdit = () => {
+    setActiveTab('OnTheWay');
+    navigation.navigate('DestinationsScreen');
+  };
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -93,12 +96,12 @@ const SummaryScreen = ({ navigation }) => {
       {/* Scrollable content */}
       <ScrollView contentContainerStyle={styles.scrollArea} showsVerticalScrollIndicator={false}>
 
-        {/* Jaffna Destinations */}
+        {/* Destinations summary */}
         {destinations.length > 0 && (
           <View style={styles.card}>
             <View style={styles.rowBetween}>
               <Text style={styles.cardTitle}>Destinations ({destinations.length})</Text>
-              <TouchableOpacity onPress={handleSelectionEdit}>
+              <TouchableOpacity onPress={handleDestinationEdit}>
                 <Text style={styles.editText}>Edit</Text>
               </TouchableOpacity>
             </View>
@@ -106,20 +109,20 @@ const SummaryScreen = ({ navigation }) => {
               <View key={item.id} style={styles.destinationCard}>
                 <Image source={item.image} style={styles.destinationImage} />
                 <View>
-                  <Text style={styles.destinationName}>{item.title}</Text>
-                  <Text style={styles.destinationDetail}>• {item.location}</Text>
+                  <Text style={styles.destinationName}>{item.name}</Text>
+                  <Text style={styles.destinationDetail}>• {item.district}</Text>
                 </View>
               </View>
             ))}
           </View>
         )}
 
-        {/* On the Way Destinations */}
+        {/* On the Way Destinations summary */}
         {onTheWayDestinations.length > 0 && (
           <View style={styles.card}>
             <View style={styles.rowBetween}>
               <Text style={styles.cardTitle}>On the Way Destinations ({onTheWayDestinations.length})</Text>
-              <TouchableOpacity onPress={handleSelectionEdit}>
+              <TouchableOpacity onPress={handleOntheWayEdit}>
                 <Text style={styles.editText}>Edit</Text>
               </TouchableOpacity>
             </View>
@@ -127,8 +130,8 @@ const SummaryScreen = ({ navigation }) => {
               <View key={item.id} style={styles.destinationCard}>
                 <Image source={item.image} style={styles.destinationImage} />
                 <View>
-                  <Text style={styles.destinationName}>{item.title}</Text>
-                  <Text style={styles.destinationDetail}>• {item.location}</Text>
+                  <Text style={styles.destinationName}>{item.name}</Text>
+                  <Text style={styles.destinationDetail}>• {item.startDistrict} - {item.endDistrict}</Text>
                 </View>
               </View>
             ))}
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   destinationImage: { width: 50, height: 50, borderRadius: 10, marginRight: 10 },
-  destinationName: { fontSize: 14, fontWeight: 'bold' },
+  destinationName: {fontSize: 14, fontWeight: 'bold' },
   destinationDetail: { fontSize: 12, color: 'gray' },
   aiText: { color: 'white', textAlign: 'center', marginVertical: 15 },
   createPlanButton: {
