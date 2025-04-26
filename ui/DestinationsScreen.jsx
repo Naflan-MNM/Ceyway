@@ -12,15 +12,12 @@ import RenderItem from '../components/RenderItem';
 import { Ionicons } from '@expo/vector-icons';
 
 const DestinationsScreen = ({ navigation }) => {
-  const { destinationData, onTheWayData, selectedItems, toggleSelection } = useContext(CeywayContext);
-  const [activeTab, setActiveTab] = useState('Destinations');
+  const { destinationData, onTheWayData, selectedItems, toggleSelection, activeTab, setActiveTab } = useContext(CeywayContext);
 
 
   const handleNext = () => {
-    console.log(selectedItems);
     navigation.navigate('MembersDateVehicleScreen');
   };
-
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
