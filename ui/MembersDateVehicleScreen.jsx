@@ -83,7 +83,6 @@ const MembersDateVehicleScreen = ({ navigation }) => {
   ];
 
   const handleNext = () => {
-    console.log(`members: ${members}, vehicle: ${vehicle}, date: ${fromDate} - ${toDate}`);
     navigation.navigate('SummaryScreen');
   };
 
