@@ -12,7 +12,7 @@ import RenderItem from '../components/RenderItem';
 import { Ionicons } from '@expo/vector-icons';
 
 const DestinationsScreen = ({ navigation }) => {
-  const { jaffnaData, onTheWayData, selectedItems, toggleSelection } = useContext(CeywayContext);
+  const { destinationData, onTheWayData, selectedItems, toggleSelection } = useContext(CeywayContext);
   const [activeTab, setActiveTab] = useState('Destinations');
 
 
@@ -51,7 +51,7 @@ const DestinationsScreen = ({ navigation }) => {
       <Text style={styles.selectionText}>{selectedItems.length} destinations selected. (Select destinations)</Text>
       
       <FlatList
-        data={activeTab === 'Destinations' ? jaffnaData : onTheWayData}
+        data={activeTab === 'Destinations' ? destinationData : onTheWayData}
         renderItem={({ item }) => (
           <RenderItem item={item} selectedItems={selectedItems} toggleSelection={toggleSelection} />
         )}
