@@ -52,13 +52,12 @@ const CeywayContextProvider = (props) => {
     const [vehicle, setVehicle] = useState('Car');//handle the type of vehical 
     const [fromDate, setFromDate] = useState(null);//handke the from date
     const [toDate, setToDate] = useState(null);//handle the to date
-    
-
+    /*  */
     const [destinationData, setdestinationData] = useState([]);
     const [onTheWayData, setOnTheWayData] = useState([]); 
-   
-      
-    
+   /* used in inthe summary screen, destinatons screen */
+   const [activeTab, setActiveTab] = useState('Destinations');
+
     /* // Filter the LocationData into two arrays: Jaffna and On the way
     const destinationData = LocationData.filter(item => item.location === 'Jaffna');
     const onTheWayData = LocationData.filter(item => item.location === 'On the way'); */
@@ -77,8 +76,8 @@ const CeywayContextProvider = (props) => {
    
         
     const value = {
-        LocationData,destinationData,onTheWayData,selectedItems,adults,toDate,fromDate,vehicle,children,members,LOCAL_IP,
-        toggleSelection,setToDate,setFromDate,setVehicle,setChildren,setAdults,setMembers,setdestinationData,setOnTheWayData
+        LocationData,destinationData,onTheWayData,selectedItems,adults,toDate,fromDate,vehicle,children,members,LOCAL_IP,activeTab,
+        toggleSelection,setToDate,setFromDate,setVehicle,setChildren,setAdults,setMembers,setdestinationData,setOnTheWayData,setActiveTab,
     };
 
     return (
