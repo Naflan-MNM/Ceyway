@@ -21,7 +21,8 @@
     "react-native": "^0.76.8",
     "react-native-calendars": "^1.1310.0",
     "react-native-elements": "^3.4.3",
-    "react-native-modern-datepicker": "^1.0.0-beta.91"
+    "react-native-modern-datepicker": "^1.0.0-beta.91",
+    "expo-sharing": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
