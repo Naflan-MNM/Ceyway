@@ -13,6 +13,7 @@ const PlanByAIScreen = ({ route, navigation }) => {
   const { fromDate, toDate, members, vehicle } = useContext(CeywayContext);
   const { planData } = route.params;
   const { tripPlan } = planData.data;
+  console.log(tripPlan);
   return (
     <View style={styles.container}>
       <View style={styles.header}>
