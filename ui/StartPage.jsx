@@ -1,61 +1,112 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, StyleSheet, FlatList, TouchableOpacity, Image, StatusBar, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import FooterNavigation from '../components/FooterNavigation';
-import { CeywayContext } from '../context/CeywayContext';
-
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  StatusBar,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import FooterNavigation from "../components/FooterNavigation";
+import { CeywayContext } from "../context/CeywayContext";
 
 const StartPage = ({ navigation }) => {
-  const { setdestinationData, setOnTheWayData,LOCAL_IP } = useContext(CeywayContext);
+  const { setdestinationData, setOnTheWayData, LOCAL_IP } =
+    useContext(CeywayContext);
 
-  const [currentLocation, setCurrentLocation] = useState('');
-  const [destination, setDestination] = useState('');
+  const [currentLocation, setCurrentLocation] = useState("");
+  const [destination, setDestination] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // ✅ Track loading
+
+  console.log(`current location is : ${currentLocation}`);
+  console.log(`destination is : ${destination}`);
+
+  // Helper function to convert any string to Title Case.
+  const toTitleCase = (str) => {
+    return str
+      .replace(/([A-Z])/g, " $1") // separate PascalCase or camelCase
+      .replace(/\s+/g, " ") // normalize whitespace
+      .trim()
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
+
   const GoToStartPage2 = async () => {
-    /* if (!currentLocation || !destination) return; */ 
+    if (!currentLocation || !destination) return;
+
+    setIsLoading(true); // ✅ Show loader
 
     try {
-      const destinationRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-attractions/Anuradhapura`);
-      if (!destinationRes.ok) throw new Error('Destination fetch failed');
+      const destinationRes = await fetch(
+        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${currentLocation}`
+      );
+      if (!destinationRes.ok) {
+        const errorText = await destinationRes.text();
+        throw new Error(`Destination fetch failed: ${errorText}`);
+      }
       const destinationData = await destinationRes.json();
 
-      const onTheWayRes = await fetch(`http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/Trincomalee/Anuradhapura`);
-      if (!onTheWayRes.ok) throw new Error('On-the-way fetch failed');
+      const onTheWayRes = await fetch(
+        `http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/${destination}/${currentLocation}`
+      );
+      if (!onTheWayRes.ok) {
+        const errorText = await onTheWayRes.text();
+        throw new Error(`On-the-way fetch failed: ${errorText}`);
+      }
       const onTheWayData = await onTheWayRes.json();
 
       setdestinationData(destinationData);
       setOnTheWayData(onTheWayData);
 
-      navigation.navigate('DestinationsScreen');
+      navigation.navigate("DestinationsScreen");
     } catch (err) {
-      console.error('Failed to fetch travel data:', err);
-      Alert.alert('Error', 'Unable to fetch travel data. Please try again later.');
+      console.error("Failed to fetch travel data:", err.message);
+
+      Alert.alert(
+        "Error",
+        "We couldn’t fetch travel data. Please check your connection or try again.",
+        [
+          { text: "Cancel", style: "cancel" },
+          { text: "Retry", onPress: GoToStartPage2 }, // ✅ Retry option
+        ]
+      );
+    } finally {
+      setIsLoading(false); // ✅ Always hide loader
     }
   };
-
   const trendingDestinations = [
     {
-      id: '1',
-      title: 'Ella Sri Lanka',
-      description: "Ella is not just a destination; it's a journey into nature's heart.",
-      image: require('../assets/images/ella.jpg'),
+      id: "1",
+      title: "Ella Sri Lanka",
+      description:
+        "Ella is not just a destination; it's a journey into nature's heart.",
+      image: require("../assets/images/ella.jpg"),
     },
     {
-      id: '2',
-      title: 'Casuarina Beach',
-      description: 'Casuarina Beach where the horizon meets tranquility.',
-      image: require('../assets/images/casuarina.jpg'),
+      id: "2",
+      title: "Casuarina Beach",
+      description: "Casuarina Beach where the horizon meets tranquility.",
+      image: require("../assets/images/casuarina.jpg"),
     },
     {
-      id: '3',
-      title: 'Horton Plains',
-      description: 'Step into Horton Plains, where nature whispers its secrets.',
-      image: require('../assets/images/horton.jpg'),
+      id: "3",
+      title: "Horton Plains",
+      description:
+        "Step into Horton Plains, where nature whispers its secrets.",
+      image: require("../assets/images/horton.jpg"),
     },
     {
-      id: '4',
-      title: 'Knuckles Mountain Range',
-      description: 'Find serenity in the misty peaks of the Knuckles Range.',
-      image: require('../assets/images/knuckles.jpg'),
+      id: "4",
+      title: "Knuckles Mountain Range",
+      description: "Find serenity in the misty peaks of the Knuckles Range.",
+      image: require("../assets/images/knuckles.jpg"),
     },
   ];
 
@@ -78,7 +129,10 @@ const StartPage = ({ navigation }) => {
             placeholder="Your location"
             placeholderTextColor="#888"
             value={currentLocation}
-            onChangeText={setCurrentLocation}
+            onChangeText={(text) => {
+              const formatted = toTitleCase(text);
+              if (formatted !== currentLocation) setCurrentLocation(formatted);
+            }}
           />
         </View>
 
@@ -90,7 +144,10 @@ const StartPage = ({ navigation }) => {
             placeholder="Where to go?"
             placeholderTextColor="#888"
             value={destination}
-            onChangeText={setDestination}
+            onChangeText={(text) => {
+              const formatted = toTitleCase(text);
+              if (formatted !== destination) setDestination(formatted);
+            }}
           />
         </View>
 
@@ -100,7 +157,9 @@ const StartPage = ({ navigation }) => {
       </View>
 
       {/* Trending Destinations Section */}
-      <Text style={styles.sectionTitle}>Explore Trending Destinations in Sri Lanka</Text>
+      <Text style={styles.sectionTitle}>
+        Explore Trending Destinations in Sri Lanka
+      </Text>
       <FlatList
         data={trendingDestinations}
         keyExtractor={(item) => item.id}
@@ -125,31 +184,31 @@ const StartPage = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1A1A2E',
+    backgroundColor: "#1A1A2E",
   },
   header: {
     marginTop: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   headerText: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
+    fontWeight: "bold",
+    color: "#fff",
   },
   inputContainer: {
     padding: 15,
   },
   label: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 5,
     marginLeft: 5,
   },
   inputBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderRadius: 8,
     paddingHorizontal: 10,
     marginBottom: 15,
@@ -158,25 +217,25 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 40,
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginLeft: 10,
   },
   findButton: {
-    backgroundColor: '#6C63FF',
+    backgroundColor: "#6C63FF",
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
     padding: 10,
     marginTop: 10,
   },
   findButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   sectionTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginLeft: 15,
     marginVertical: 10,
   },
@@ -186,19 +245,19 @@ const styles = StyleSheet.create({
     gap: 15,
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    overflow: 'hidden',
-    width: '100%',
+    overflow: "hidden",
+    width: "100%",
     marginBottom: 15,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
   },
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
   },
   cardContent: {
@@ -206,12 +265,12 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: "bold",
+    color: "#333",
   },
   cardDescription: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginTop: 5,
   },
 });
