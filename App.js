@@ -17,13 +17,10 @@ import MembersDateVehicleScreen from "./ui/MembersDateVehicleScreen";
 import SummaryScreen from "./ui/SummaryScreen";
 import ProcessingScreen from "./ui/ProcessingScreen";
 import PlanByAIScreen from "./ui/PlanByAIScreen";
-import MapboxGL from "@rnmapbox/maps";
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-  MapboxGL.setAccessToken(null); // No token needed for MapLibre!
-  MapboxGL.setTelemetryEnabled(false); // Optional: disable telemetry
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="LandingPage">
