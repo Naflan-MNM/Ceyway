@@ -17,6 +17,7 @@ import MembersDateVehicleScreen from "./ui/MembersDateVehicleScreen";
 import SummaryScreen from "./ui/SummaryScreen";
 import ProcessingScreen from "./ui/ProcessingScreen";
 import PlanByAIScreen from "./ui/PlanByAIScreen";
+import LocationPicker from "./ui/LocationPicker";
 
 const Stack = createNativeStackNavigator();
 
@@ -91,6 +92,11 @@ export default function App() {
           name="PlanByAIScreen"
           component={PlanByAIScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="LocationPicker"
+          component={LocationPicker}
+          options={{ title: "Pick Location" }}
         />
       </Stack.Navigator>
     </NavigationContainer>

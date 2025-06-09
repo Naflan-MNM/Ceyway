@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
@@ -15,7 +15,7 @@ import { Ionicons } from "@expo/vector-icons";
 import FooterNavigation from "../components/FooterNavigation";
 import { CeywayContext } from "../context/CeywayContext";
 
-const StartPage = ({ navigation }) => {
+const StartPage = ({ navigation, route }) => {
   const { setdestinationData, setOnTheWayData, LOCAL_IP } =
     useContext(CeywayContext);
 
@@ -23,8 +23,17 @@ const StartPage = ({ navigation }) => {
   const [destination, setDestination] = useState("");
   const [isLoading, setIsLoading] = useState(false); // ✅ Track loading
 
-  console.log(`current location is : ${currentLocation}`);
-  console.log(`destination is : ${destination}`);
+  /* console.log(`current location is : ${currentLocation}`);
+  console.log(`destination is : ${destination}`); */
+
+  useEffect(() => {
+    if (route.params?.currentName && route.params?.currentCoords) {
+      setCurrentLocation(route.params.currentName);
+    }
+    if (route.params?.destinationName && route.params?.destinationCoords) {
+      setDestination(route.params.destinationName);
+    }
+  }, [route.params]);
 
   // Helper function to convert any string to Title Case.
   const toTitleCase = (str) => {
@@ -71,7 +80,7 @@ const StartPage = ({ navigation }) => {
 
       Alert.alert(
         "Error",
-        "We couldn’t fetch travel data. Please check your connection or try again.",
+        "We couldn’t fetch travel data. Please check your connection or check the spelling and try again.",
         [
           { text: "Cancel", style: "cancel" },
           { text: "Retry", onPress: GoToStartPage2 }, // ✅ Retry option
@@ -124,16 +133,18 @@ const StartPage = ({ navigation }) => {
         <Text style={styles.label}>Current Location</Text>
         <View style={styles.inputBox}>
           <Ionicons name="location-outline" size={20} color="#888" />
-          <TextInput
+          <TouchableOpacity
             style={styles.input}
-            placeholder="Your location"
-            placeholderTextColor="#888"
-            value={currentLocation}
-            onChangeText={(text) => {
-              const formatted = toTitleCase(text);
-              if (formatted !== currentLocation) setCurrentLocation(formatted);
-            }}
-          />
+            onPress={() =>
+              navigation.navigate("LocationPicker", {
+                field: "current",
+              })
+            }
+          >
+            <Text style={{ color: currentLocation ? "#333" : "#888" }}>
+              {currentLocation || "Select current location"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         <Text style={styles.label}>Destination</Text>
