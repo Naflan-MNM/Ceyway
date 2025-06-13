@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -16,6 +16,7 @@ import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 
 const LocationPicker = ({ route, navigation }) => {
+  const mapRef = useRef(null);
   const { field } = route.params;
   const [location, setLocation] = useState(null);
   const [region, setRegion] = useState(null);
@@ -37,8 +38,8 @@ const LocationPicker = ({ route, navigation }) => {
       const initialRegion = {
         latitude,
         longitude,
-        latitudeDelta: 0.01,
-        longitudeDelta: 0.01,
+        latitudeDelta: 0.5,
+        longitudeDelta: 0.5,
       };
 
       setRegion(initialRegion);
@@ -47,25 +48,7 @@ const LocationPicker = ({ route, navigation }) => {
     })();
   }, []);
 
-  // Search from Nominatim API
-  const searchLocation = async (query) => {
-    if (!query) {
-      setSuggestions([]);
-      return;
-    }
-
-    const response = await fetch(
-      `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-        query
-      )}&format=json&addressdetails=1&limit=5&countrycodes=lk`
-    );
-    const data = await response.json();
-    setSuggestions(data);
-  };
-
-  const selectSuggestion = (item) => {
-    const { lat, lon, display_name } = item;
-
+  const moveToLocation = (lat, lon) => {
     const newRegion = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
@@ -75,6 +58,41 @@ const LocationPicker = ({ route, navigation }) => {
 
     setRegion(newRegion);
     setLocation({ latitude: parseFloat(lat), longitude: parseFloat(lon) });
+    mapRef.current?.animateToRegion(newRegion, 1000);
+  };
+
+  const searchLocation = async (query, moveToFirstResult = false) => {
+    if (!query) {
+      setSuggestions([]);
+      return;
+    }
+
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+      query
+    )}&format=json&addressdetails=1&limit=5&countrycodes=lk`;
+
+    try {
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "CeywayApp/1.0 naflanm084@gmail.com",
+        },
+      });
+
+      const data = await response.json();
+      setSuggestions(data);
+
+      if (moveToFirstResult && data.length > 0) {
+        selectSuggestion(data[0]);
+      }
+    } catch (error) {
+      console.error("Nominatim error:", error);
+      setSuggestions([]);
+    }
+  };
+
+  const selectSuggestion = (item) => {
+    const { lat, lon, display_name } = item;
+    moveToLocation(lat, lon);
     setSearchQuery(display_name);
     setSuggestions([]);
     Keyboard.dismiss();
@@ -82,8 +100,11 @@ const LocationPicker = ({ route, navigation }) => {
 
   const confirmLocation = async () => {
     if (!location) return;
+
     const places = await Location.reverseGeocodeAsync(location);
-    const name = places[0]?.name || "Selected Location";
+    const place = places[0];
+    const name =
+      place?.name || place?.city || place?.region || "Selected Location";
 
     navigation.navigate("StartPage", {
       [`${field}Coords`]: location,
@@ -102,7 +123,6 @@ const LocationPicker = ({ route, navigation }) => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        {/* Search Bar */}
         <View style={styles.searchContainer}>
           <Ionicons
             name="search"
@@ -119,7 +139,7 @@ const LocationPicker = ({ route, navigation }) => {
               searchLocation(text);
             }}
             returnKeyType="search"
-            onSubmitEditing={() => searchLocation(searchQuery)}
+            onSubmitEditing={() => searchLocation(searchQuery, true)}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity
@@ -138,49 +158,44 @@ const LocationPicker = ({ route, navigation }) => {
           )}
         </View>
 
-        {/* Suggestions List */}
-        {suggestions.length > 0 && (
-          <FlatList
-            data={suggestions}
-            keyExtractor={(item) => item.place_id.toString()}
-            style={styles.suggestionList}
-            renderItem={({ item }) => (
-              <TouchableOpacity
-                style={styles.suggestionItem}
-                onPress={() => selectSuggestion(item)}
-              >
-                <Text>{item.display_name}</Text>
-              </TouchableOpacity>
-            )}
-          />
-        )}
-
-        {/* Map */}
-        <MapView
-          style={StyleSheet.absoluteFill}
-          provider={PROVIDER_GOOGLE}
-          region={region}
-          showsUserLocation={true}
-          showsMyLocationButton={true}
-          zoomControlEnabled={Platform.OS === "android"}
-          onPress={(e) => setLocation(e.nativeEvent.coordinate)}
-        >
-          {location && (
-            <Marker
-              coordinate={location}
-              draggable
-              onDragEnd={(e) => setLocation(e.nativeEvent.coordinate)}
-            />
+        <FlatList
+          data={suggestions}
+          keyExtractor={(item) => item.place_id.toString()}
+          style={styles.suggestionList}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => selectSuggestion(item)}>
+              <Text style={styles.suggestionItem}>{item.display_name}</Text>
+            </TouchableOpacity>
           )}
-        </MapView>
+        />
 
-        {/* Confirm Button */}
-        <TouchableOpacity
-          style={styles.confirmButton}
-          onPress={confirmLocation}
-        >
-          <Text style={styles.buttonText}>Confirm Location</Text>
-        </TouchableOpacity>
+        <View style={{ flex: 1 }}>
+          <MapView
+            ref={mapRef}
+            style={StyleSheet.absoluteFill}
+            provider={PROVIDER_GOOGLE}
+            region={region}
+            showsUserLocation={true}
+            showsMyLocationButton={true}
+            zoomControlEnabled={Platform.OS === "android"}
+            onPress={(e) => setLocation(e.nativeEvent.coordinate)}
+          >
+            {location && (
+              <Marker
+                coordinate={location}
+                draggable
+                onDragEnd={(e) => setLocation(e.nativeEvent.coordinate)}
+              />
+            )}
+          </MapView>
+
+          <TouchableOpacity
+            style={styles.confirmButton}
+            onPress={confirmLocation}
+          >
+            <Text style={styles.buttonText}>Confirm Location</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </TouchableWithoutFeedback>
   );

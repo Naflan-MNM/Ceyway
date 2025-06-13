@@ -2,7 +2,6 @@ import React, { useState, useContext, useEffect } from "react";
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   FlatList,
   TouchableOpacity,
@@ -18,40 +17,59 @@ import { CeywayContext } from "../context/CeywayContext";
 const StartPage = ({ navigation, route }) => {
   const { setdestinationData, setOnTheWayData, LOCAL_IP } =
     useContext(CeywayContext);
-
   const [currentLocation, setCurrentLocation] = useState("");
   const [destination, setDestination] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // ✅ Track loading
+  const [isLoading, setIsLoading] = useState(false);
 
-  /* console.log(`current location is : ${currentLocation}`);
-  console.log(`destination is : ${destination}`); */
+  const [currentLocationData, setCurrentLocationData] = useState({
+    latitude: null,
+    longitude: null,
+    distance: null,
+    name: "",
+  });
+
+  const [destinationLocationData, setDestinationLocationData] = useState({
+    latitude: null,
+    longitude: null,
+    distance: null,
+    name: "",
+  });
 
   useEffect(() => {
-    if (route.params?.currentName && route.params?.currentCoords) {
+    if (route.params?.currentCoords) {
+      setCurrentLocationData((prev) => ({
+        ...prev,
+        latitude: route.params.currentCoords.latitude,
+        longitude: route.params.currentCoords.longitude,
+      }));
+    }
+    if (route.params?.currentName) {
       setCurrentLocation(route.params.currentName);
     }
-    if (route.params?.destinationName && route.params?.destinationCoords) {
+    if (route.params?.destinationName) {
       setDestination(route.params.destinationName);
+    }
+    if (route.params?.destinationCoords) {
+      setDestinationLocationData((prev) => ({
+        ...prev,
+        latitude: route.params.destinationCoords.latitude,
+        longitude: route.params.destinationCoords.longitude,
+      }));
     }
   }, [route.params]);
 
-  // Helper function to convert any string to Title Case.
-  const toTitleCase = (str) => {
-    return str
-      .replace(/([A-Z])/g, " $1") // separate PascalCase or camelCase
-      .replace(/\s+/g, " ") // normalize whitespace
-      .trim()
-      .toLowerCase()
-      .split(" ")
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(" ");
-  };
+  useEffect(() => {
+    console.log("Updated currentLocation:", currentLocationData);
+  }, [currentLocationData]);
+
+  useEffect(() => {
+    console.log("Updated destination:", destinationLocationData);
+  }, [destinationLocationData]);
 
   const GoToStartPage2 = async () => {
     if (!currentLocation || !destination) return;
 
-    setIsLoading(true); // ✅ Show loader
-
+    setIsLoading(true);
     try {
       const destinationRes = await fetch(
         `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${currentLocation}`
@@ -77,19 +95,19 @@ const StartPage = ({ navigation, route }) => {
       navigation.navigate("DestinationsScreen");
     } catch (err) {
       console.error("Failed to fetch travel data:", err.message);
-
       Alert.alert(
         "Error",
-        "We couldn’t fetch travel data. Please check your connection or check the spelling and try again.",
+        "We couldn’t fetch travel data. Please check your connection or spelling and try again.",
         [
           { text: "Cancel", style: "cancel" },
-          { text: "Retry", onPress: GoToStartPage2 }, // ✅ Retry option
+          { text: "Retry", onPress: GoToStartPage2 },
         ]
       );
     } finally {
-      setIsLoading(false); // ✅ Always hide loader
+      setIsLoading(false);
     }
   };
+
   const trendingDestinations = [
     {
       id: "1",
@@ -123,12 +141,10 @@ const StartPage = ({ navigation, route }) => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
 
-      {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerText}>Where do you want to go?</Text>
       </View>
 
-      {/* Location Inputs */}
       <View style={styles.inputContainer}>
         <Text style={styles.label}>Current Location</Text>
         <View style={styles.inputBox}>
@@ -136,9 +152,7 @@ const StartPage = ({ navigation, route }) => {
           <TouchableOpacity
             style={styles.input}
             onPress={() =>
-              navigation.navigate("LocationPicker", {
-                field: "current",
-              })
+              navigation.navigate("LocationPicker", { field: "current" })
             }
           >
             <Text style={{ color: currentLocation ? "#333" : "#888" }}>
@@ -150,27 +164,32 @@ const StartPage = ({ navigation, route }) => {
         <Text style={styles.label}>Destination</Text>
         <View style={styles.inputBox}>
           <Ionicons name="navigate-outline" size={20} color="#888" />
-          <TextInput
+          <TouchableOpacity
             style={styles.input}
-            placeholder="Where to go?"
-            placeholderTextColor="#888"
-            value={destination}
-            onChangeText={(text) => {
-              const formatted = toTitleCase(text);
-              if (formatted !== destination) setDestination(formatted);
-            }}
-          />
+            onPress={() =>
+              navigation.navigate("LocationPicker", { field: "destination" })
+            }
+          >
+            <Text style={{ color: destination ? "#333" : "#888" }}>
+              {destination || "Select destination"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.findButton} onPress={GoToStartPage2}>
-          <Text style={styles.findButtonText}>Find Destinations</Text>
+        <TouchableOpacity
+          style={styles.findButton}
+          onPress={GoToStartPage2}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <Text style={styles.findButtonText}>Find Destinations</Text>
+          )}
         </TouchableOpacity>
       </View>
 
-      {/* Trending Destinations Section */}
-      <Text style={styles.sectionTitle}>
-        Explore Trending Destinations in Sri Lanka
-      </Text>
+      <Text style={styles.sectionTitle}>Explore Trending Destinations</Text>
       <FlatList
         data={trendingDestinations}
         keyExtractor={(item) => item.id}
@@ -183,7 +202,7 @@ const StartPage = ({ navigation, route }) => {
             </View>
           </View>
         )}
-        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.cardList}
       />
 
@@ -193,29 +212,11 @@ const StartPage = ({ navigation, route }) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#1A1A2E",
-  },
-  header: {
-    marginTop: 40,
-    alignItems: "center",
-  },
-  headerText: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#fff",
-  },
-  inputContainer: {
-    padding: 15,
-  },
-  label: {
-    color: "#fff",
-    fontSize: 14,
-    fontWeight: "500",
-    marginBottom: 5,
-    marginLeft: 5,
-  },
+  container: { flex: 1, backgroundColor: "#1A1A2E" },
+  header: { marginTop: 40, alignItems: "center" },
+  headerText: { fontSize: 20, fontWeight: "bold", color: "#fff" },
+  inputContainer: { padding: 15 },
+  label: { color: "#fff", fontSize: 14, fontWeight: "500", marginBottom: 5 },
   inputBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -224,13 +225,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginBottom: 15,
   },
-  input: {
-    flex: 1,
-    height: 40,
-    fontSize: 16,
-    color: "#333",
-    marginLeft: 10,
-  },
+  input: { flex: 1, height: 40, fontSize: 16, color: "#333", marginLeft: 10 },
   findButton: {
     backgroundColor: "#6C63FF",
     borderRadius: 8,
@@ -238,11 +233,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
   },
-  findButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  findButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   sectionTitle: {
     color: "#fff",
     fontSize: 18,
@@ -250,16 +241,11 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginVertical: 10,
   },
-  cardList: {
-    paddingLeft: 15,
-    paddingRight: 15,
-    gap: 15,
-  },
+  cardList: { paddingHorizontal: 15, paddingBottom: 60 },
   card: {
     backgroundColor: "#fff",
     borderRadius: 10,
     overflow: "hidden",
-    width: "100%",
     marginBottom: 15,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -267,23 +253,10 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  cardImage: {
-    width: "100%",
-    height: 120,
-  },
-  cardContent: {
-    padding: 10,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#666",
-    marginTop: 5,
-  },
+  cardImage: { width: "100%", height: 120 },
+  cardContent: { padding: 10 },
+  cardTitle: { fontSize: 16, fontWeight: "bold", color: "#333" },
+  cardDescription: { fontSize: 14, color: "#666", marginTop: 5 },
 });
 
 export default StartPage;
