@@ -18,6 +18,7 @@ import SummaryScreen from "./ui/SummaryScreen";
 import ProcessingScreen from "./ui/ProcessingScreen";
 import PlanByAIScreen from "./ui/PlanByAIScreen";
 import LocationPicker from "./ui/LocationPicker";
+import TrendingPlaceDetails from "./ui/TrendingPlaceDetails";
 
 const Stack = createNativeStackNavigator();
 
@@ -97,6 +98,11 @@ export default function App() {
           name="LocationPicker"
           component={LocationPicker}
           options={{ title: "Pick Location" }}
+        />
+        <Stack.Screen
+          name="TrendingPlaceDetails"
+          component={TrendingPlaceDetails}
+          options={{ headerShown: false }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -3,6 +3,7 @@ import {
   View,
   Text,
   StyleSheet,
+  TextInput,
   FlatList,
   TouchableOpacity,
   Image,
@@ -14,12 +15,41 @@ import { Ionicons } from "@expo/vector-icons";
 import FooterNavigation from "../components/FooterNavigation";
 import { CeywayContext } from "../context/CeywayContext";
 
+const sriLankaDistricts = [
+  "Colombo",
+  "Gampaha",
+  "Kalutara",
+  "Kandy",
+  "Matale",
+  "Nuwara Eliya",
+  "Galle",
+  "Matara",
+  "Hambantota",
+  "Jaffna",
+  "Kilinochchi",
+  "Mannar",
+  "Vavuniya",
+  "Mullaitivu",
+  "Batticaloa",
+  "Ampara",
+  "Trincomalee",
+  "Kurunegala",
+  "Puttalam",
+  "Anuradhapura",
+  "Polonnaruwa",
+  "Badulla",
+  "Moneragala",
+  "Ratnapura",
+  "Kegalle",
+];
+
 const StartPage = ({ navigation, route }) => {
   const { setdestinationData, setOnTheWayData, LOCAL_IP } =
     useContext(CeywayContext);
   const [currentLocation, setCurrentLocation] = useState("");
   const [destination, setDestination] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [suggestedDistricts, setSuggestedDistricts] = useState([]);
 
   const [currentLocationData, setCurrentLocationData] = useState({
     latitude: null,
@@ -28,12 +58,16 @@ const StartPage = ({ navigation, route }) => {
     name: "",
   });
 
-  const [destinationLocationData, setDestinationLocationData] = useState({
-    latitude: null,
-    longitude: null,
-    distance: null,
-    name: "",
-  });
+  const toTitleCase = (str) => {
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase()
+      .split(" ")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  };
 
   useEffect(() => {
     if (route.params?.currentCoords) {
@@ -46,33 +80,19 @@ const StartPage = ({ navigation, route }) => {
     if (route.params?.currentName) {
       setCurrentLocation(route.params.currentName);
     }
-    if (route.params?.destinationName) {
-      setDestination(route.params.destinationName);
-    }
-    if (route.params?.destinationCoords) {
-      setDestinationLocationData((prev) => ({
-        ...prev,
-        latitude: route.params.destinationCoords.latitude,
-        longitude: route.params.destinationCoords.longitude,
-      }));
-    }
   }, [route.params]);
 
   useEffect(() => {
     console.log("Updated currentLocation:", currentLocationData);
   }, [currentLocationData]);
 
-  useEffect(() => {
-    console.log("Updated destination:", destinationLocationData);
-  }, [destinationLocationData]);
-
   const GoToStartPage2 = async () => {
-    if (!currentLocation || !destination) return;
+    /* if (!currentLocation || !destination) return; */
 
-    setIsLoading(true);
+    /* setIsLoading(true);
     try {
       const destinationRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${currentLocation}`
+        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/Anuradhapura`
       );
       if (!destinationRes.ok) {
         const errorText = await destinationRes.text();
@@ -81,7 +101,7 @@ const StartPage = ({ navigation, route }) => {
       const destinationData = await destinationRes.json();
 
       const onTheWayRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/get-ontheway-attractions/${destination}/${currentLocation}`
+        `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=8.0385&originLng=80.5939&destLat=8.5922&destLng=81.1968&maxDistanceKm=15`
       );
       if (!onTheWayRes.ok) {
         const errorText = await onTheWayRes.text();
@@ -105,7 +125,8 @@ const StartPage = ({ navigation, route }) => {
       );
     } finally {
       setIsLoading(false);
-    }
+    } */
+    navigation.navigate("DestinationsScreen");
   };
 
   const trendingDestinations = [
@@ -137,6 +158,8 @@ const StartPage = ({ navigation, route }) => {
     },
   ];
 
+  console.log("destinatios", destination);
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1A1A2E" />
@@ -164,17 +187,40 @@ const StartPage = ({ navigation, route }) => {
         <Text style={styles.label}>Destination</Text>
         <View style={styles.inputBox}>
           <Ionicons name="navigate-outline" size={20} color="#888" />
-          <TouchableOpacity
+          <TextInput
             style={styles.input}
-            onPress={() =>
-              navigation.navigate("LocationPicker", { field: "destination" })
-            }
-          >
-            <Text style={{ color: destination ? "#333" : "#888" }}>
-              {destination || "Select destination"}
-            </Text>
-          </TouchableOpacity>
+            placeholder="Where to go?"
+            placeholderTextColor="#888"
+            value={destination}
+            onChangeText={(text) => {
+              const formatted = toTitleCase(text);
+              setDestination(formatted);
+              const filtered = sriLankaDistricts.filter((d) =>
+                d.toLowerCase().startsWith(formatted.toLowerCase())
+              );
+              setSuggestedDistricts(formatted ? filtered : []);
+            }}
+          />
         </View>
+
+        {suggestedDistricts.length > 0 && (
+          <FlatList
+            data={suggestedDistricts}
+            keyExtractor={(item) => item}
+            style={styles.suggestionList}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                style={styles.suggestionItem}
+                onPress={() => {
+                  setDestination(item);
+                  setSuggestedDistricts([]);
+                }}
+              >
+                <Text style={styles.suggestionText}>{item}</Text>
+              </TouchableOpacity>
+            )}
+          />
+        )}
 
         <TouchableOpacity
           style={styles.findButton}
@@ -194,13 +240,18 @@ const StartPage = ({ navigation, route }) => {
         data={trendingDestinations}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() =>
+              navigation.navigate("TrendingPlaceDetails", { place: item })
+            }
+          >
             <Image source={item.image} style={styles.cardImage} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>{item.title}</Text>
               <Text style={styles.cardDescription}>{item.description}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         )}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.cardList}
@@ -257,6 +308,23 @@ const styles = StyleSheet.create({
   cardContent: { padding: 10 },
   cardTitle: { fontSize: 16, fontWeight: "bold", color: "#333" },
   cardDescription: { fontSize: 14, color: "#666", marginTop: 5 },
+  suggestionList: {
+    backgroundColor: "#fff",
+    marginHorizontal: 10,
+    borderRadius: 8,
+    maxHeight: 150,
+    marginBottom: 10,
+  },
+  suggestionItem: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderColor: "#eee",
+  },
+  suggestionText: {
+    color: "#333",
+    fontSize: 16,
+  },
 });
 
 export default StartPage;
