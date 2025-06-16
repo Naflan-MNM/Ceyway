@@ -58,6 +58,37 @@ const StartPage = ({ navigation, route }) => {
     name: "",
   });
 
+  const trendingDestinations = [
+    {
+      id: "1",
+      title: "Ella, Sri Lanka",
+      description:
+        "Ella is a small mountain town in Sri Lanka’s central highlands, surrounded by cloud forests and lush tea plantations. Famous for its scenic beauty, it offers iconic landmarks such as the Nine Arches Bridge, Ella Rock, and Little Adam’s Peak. The cool climate, friendly locals, and relaxed pace make it a backpacker favorite. Tea lovers can explore Halpewatte Tea Factory, while adrenaline junkies can try zip-lining or mountain biking. Don’t miss sunrise hikes, traditional home-cooked meals, and herbal massages. Best time to visit is from March to June, when skies are clear and the weather is ideal for trekking.",
+      image: require("../assets/images/ella.jpg"),
+    },
+    {
+      id: "2",
+      title: "Casuarina Beach, Jaffna",
+      description:
+        "Casuarina Beach, located in the quiet Karainagar Island off Jaffna Peninsula, is renowned for its calm, shallow waters and picturesque stretch of white sand flanked by casuarina trees. Ideal for swimming and perfect for families, it’s one of the few beaches in Sri Lanka where you can walk far into the sea. It offers a peaceful escape with fewer crowds and clean surroundings. Nearby attractions include the Jaffna Fort, Nallur Temple, and Kayts Island. It’s best visited from May to September during dry season. Bring snacks and water, as shops are limited. Ideal for sunset watchers, photographers, and those looking to explore the untouched north.",
+      image: require("../assets/images/casuarina.jpg"),
+    },
+    {
+      id: "3",
+      title: "Horton Plains National Park",
+      description:
+        "Situated in Sri Lanka’s central highlands at over 2,000 meters, Horton Plains is a protected national park with diverse flora, fauna, and montane ecosystems. The highlight is the World’s End escarpment, where a sheer cliff drops 880 meters into the valley below—best seen at dawn before the mist rolls in. The park is also home to sambar deer, leopards, and endemic birds. The 9.5 km nature trail takes visitors past World’s End, Mini World's End, and Baker’s Falls. Due to its elevation, temperatures can be chilly, especially in the early morning. The best time to visit is between January and March. No plastic bags are allowed, preserving its ecological balance.",
+      image: require("../assets/images/horton.jpg"),
+    },
+    {
+      id: "4",
+      title: "Knuckles Mountain Range",
+      description:
+        "The Knuckles Range, located northeast of Kandy, is one of Sri Lanka’s most biodiverse and scenic highland regions. Its name derives from the resemblance of its peaks to a clenched fist. A UNESCO World Heritage site, it's home to cloud forests, waterfalls, rare orchids, and wildlife including monkeys, lizards, and dozens of endemic bird species. Trekkers can embark on both day hikes and multi-day camping adventures across trails like Mini World's End and Nitro Caves. Villages like Meemure offer authentic cultural experiences with traditional meals and village homestays. Best explored between February and September. Local guides are highly recommended due to trail complexity and conservation regulations.",
+      image: require("../assets/images/knuckles.jpg"),
+    },
+  ];
+
   const toTitleCase = (str) => {
     return str
       .replace(/([A-Z])/g, " $1")
@@ -82,17 +113,13 @@ const StartPage = ({ navigation, route }) => {
     }
   }, [route.params]);
 
-  useEffect(() => {
-    console.log("Updated currentLocation:", currentLocationData);
-  }, [currentLocationData]);
-
   const GoToStartPage2 = async () => {
-    /* if (!currentLocation || !destination) return; */
+    /*if (!currentLocation || !destination) return;
 
-    /* setIsLoading(true);
+    setIsLoading(true);
     try {
       const destinationRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/Anuradhapura`
+        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${destination}`
       );
       if (!destinationRes.ok) {
         const errorText = await destinationRes.text();
@@ -101,7 +128,7 @@ const StartPage = ({ navigation, route }) => {
       const destinationData = await destinationRes.json();
 
       const onTheWayRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=8.0385&originLng=80.5939&destLat=8.5922&destLng=81.1968&maxDistanceKm=15`
+        `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=${currentLocationData.latitude}&originLng=${currentLocationData.longitude}&destLat=8.5922&destLng=81.1968&maxDistanceKm=15`
       );
       if (!onTheWayRes.ok) {
         const errorText = await onTheWayRes.text();
@@ -128,37 +155,6 @@ const StartPage = ({ navigation, route }) => {
     } */
     navigation.navigate("DestinationsScreen");
   };
-
-  const trendingDestinations = [
-    {
-      id: "1",
-      title: "Ella Sri Lanka",
-      description:
-        "Ella is not just a destination; it's a journey into nature's heart.",
-      image: require("../assets/images/ella.jpg"),
-    },
-    {
-      id: "2",
-      title: "Casuarina Beach",
-      description: "Casuarina Beach where the horizon meets tranquility.",
-      image: require("../assets/images/casuarina.jpg"),
-    },
-    {
-      id: "3",
-      title: "Horton Plains",
-      description:
-        "Step into Horton Plains, where nature whispers its secrets.",
-      image: require("../assets/images/horton.jpg"),
-    },
-    {
-      id: "4",
-      title: "Knuckles Mountain Range",
-      description: "Find serenity in the misty peaks of the Knuckles Range.",
-      image: require("../assets/images/knuckles.jpg"),
-    },
-  ];
-
-  console.log("destinatios", destination);
 
   return (
     <View style={styles.container}>
@@ -239,17 +235,25 @@ const StartPage = ({ navigation, route }) => {
       <FlatList
         data={trendingDestinations}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <TouchableOpacity
             style={styles.card}
             onPress={() =>
-              navigation.navigate("TrendingPlaceDetails", { place: item })
+              navigation.navigate("TrendingPlaceDetails", {
+                place: item,
+                allPlaces: trendingDestinations,
+                index: index,
+              })
             }
           >
             <Image source={item.image} style={styles.cardImage} />
             <View style={styles.cardContent}>
               <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardDescription}>{item.description}</Text>
+              <Text style={styles.cardDescription}>
+                {item.description.length > 100
+                  ? item.description.slice(0, 100) + "..."
+                  : item.description}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
