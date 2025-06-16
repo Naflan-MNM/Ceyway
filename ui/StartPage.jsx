@@ -169,12 +169,16 @@ const StartPage = ({ navigation, route }) => {
         <View style={styles.inputBox}>
           <Ionicons name="location-outline" size={20} color="#888" />
           <TouchableOpacity
-            style={styles.input}
+            style={[styles.input, styles.verticalCenter]}
             onPress={() =>
               navigation.navigate("LocationPicker", { field: "current" })
             }
           >
-            <Text style={{ color: currentLocation ? "#333" : "#888" }}>
+            <Text
+              style={{
+                color: currentLocation ? "#333" : "#888",
+              }}
+            >
               {currentLocation || "Select current location"}
             </Text>
           </TouchableOpacity>
@@ -328,6 +332,9 @@ const styles = StyleSheet.create({
   suggestionText: {
     color: "#333",
     fontSize: 16,
+  },
+  verticalCenter: {
+    justifyContent: "center",
   },
 });
 
