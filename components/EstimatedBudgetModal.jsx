@@ -9,17 +9,19 @@ const EstimatedBudgetModal = ({ visible, onClose, budget }) => {
       <View style={styles.modalOverlay}>
         <View style={styles.budgetModal}>
           <Text style={styles.budgetTitle}>Estimated Budget Breakdown</Text>
-          <Text style={styles.budgetItem}>
-            🚗 Transportation: {budget.transportation}
-          </Text>
-          <Text style={styles.budgetItem}>
-            🏨 Accommodation: {budget.accommodation}
-          </Text>
-          <Text style={styles.budgetItem}>🍽️ Food: {budget.food}</Text>
-          <Text style={styles.budgetItem}>
-            🎟️ Activities: {budget.activities}
-          </Text>
-          <Text style={styles.budgetTotal}>💰 Total: {budget.total}</Text>
+          <View style={styles.budgetsummary}>
+            <Text style={styles.budgetItem}>
+              🚗 Transportation: {budget.transportation}
+            </Text>
+            <Text style={styles.budgetItem}>
+              🏨 Accommodation: {budget.accommodation}
+            </Text>
+            <Text style={styles.budgetItem}>🍽️ Food: {budget.food}</Text>
+            <Text style={styles.budgetItem}>
+              🎟️ Activities: {budget.activities}
+            </Text>
+            <Text style={styles.budgetTotal}>💰 Total: {budget.total}</Text>
+          </View>
 
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Text style={styles.closeButtonText}>Close</Text>
@@ -49,6 +51,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     alignItems: "center",
   },
+  budgetsummary: {
+    padding: 20,
+  },
   budgetTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -56,7 +61,7 @@ const styles = StyleSheet.create({
     color: "#333",
   },
   budgetItem: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#444",
     marginBottom: 6,
   },
