@@ -32,14 +32,14 @@ const PlanByAIScreen = ({ route, navigation }) => {
         weatherSummary: {
           "2025-04-10": {
             location: "Anuradhapura",
-            description: "windy",
+            description: "rainy",
             temperature: 26.3,
             humidity: 80,
             windSpeed: 5.6,
           },
           "2025-04-11": {
             location: "Trincomalee",
-            description: "windy",
+            description: "rainy",
             temperature: 28.7,
             humidity: 70,
             windSpeed: 6.4,
