@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native";
 import { CeywayContext } from "../context/CeywayContext";
+import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
 
 // Import your TripDayDetails component
 import TripDayDetails from "../components/TripDayDetails.jsx";
@@ -31,14 +32,14 @@ const PlanByAIScreen = ({ route, navigation }) => {
         weatherSummary: {
           "2025-04-10": {
             location: "Anuradhapura",
-            description: "overcast clouds",
+            description: "windy",
             temperature: 26.3,
             humidity: 80,
             windSpeed: 5.6,
           },
           "2025-04-11": {
             location: "Trincomalee",
-            description: "broken clouds",
+            description: "windy",
             temperature: 28.7,
             humidity: 70,
             windSpeed: 6.4,
@@ -123,17 +124,27 @@ const PlanByAIScreen = ({ route, navigation }) => {
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [budgetModalVisible, setBudgetModalVisible] = useState(false);
 
-  const openDetails = (dayItem) => {
+  const openDetails = (dayItem, activity) => {
     setSelectedDay(dayItem);
+    setSelectedActivity(activity);
     setModalVisible(true);
   };
 
   const closeDetails = () => {
     setSelectedDay(null);
+    setSelectedActivity(null);
     setModalVisible(false);
   };
+  const openBudgetModal = () => {
+    setBudgetModalVisible(true);
+  };
 
+  const closeBudgetModal = () => {
+    setBudgetModalVisible(false);
+  };
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -178,7 +189,9 @@ const PlanByAIScreen = ({ route, navigation }) => {
                       • Travel Time: {activity.travelTime}
                     </Text>
                   )}
-                  <TouchableOpacity onPress={() => openDetails(dayItem)}>
+                  <TouchableOpacity
+                    onPress={() => openDetails(dayItem, activity)}
+                  >
                     <Text style={styles.linkText}>more details</Text>
                   </TouchableOpacity>
                 </View>
@@ -186,24 +199,39 @@ const PlanByAIScreen = ({ route, navigation }) => {
             ))}
           </View>
         ))}
+        <TouchableOpacity
+          style={styles.estimateBudgetButton}
+          onPress={openBudgetModal}
+        >
+          <Text style={styles.shareText}>Estimated Budget</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.shareButton}>
+          <Text style={styles.shareText}>Share</Text>
+        </TouchableOpacity>
       </ScrollView>
 
       {/* Detailed View Modal */}
-      <Modal visible={modalVisible} animationType="slide">
-        {selectedDay && (
-          <TripDayDetails
-            dayData={selectedDay}
-            weather={
-              tripPlan.data?.tripPlan?.weatherSummary?.[selectedDay?.date]
-            }
-            onClose={closeDetails}
-          />
-        )}
+      <Modal visible={modalVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalOverlay}>
+          {selectedDay && selectedActivity && (
+            <TripDayDetails
+              dayData={selectedDay}
+              activity={selectedActivity}
+              weather={
+                tripPlan.data?.tripPlan?.weatherSummary?.[selectedDay?.date]
+              }
+              onClose={closeDetails}
+            />
+          )}
+        </View>
       </Modal>
 
-      <TouchableOpacity style={styles.shareButton}>
-        <Text style={styles.shareText}>Share</Text>
-      </TouchableOpacity>
+      {/* Estimated Budget Modal */}
+      <EstimatedBudgetModal
+        visible={budgetModalVisible}
+        onClose={closeBudgetModal}
+        budget={tripPlan.data.tripPlan.estimatedBudget}
+      />
     </View>
   );
 };
@@ -291,10 +319,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   shareButton: {
-    position: "absolute",
+    /* position: "absolute",
     bottom: 20,
     left: 16,
-    right: 16,
+    right: 16, */
+    top: 20,
+    backgroundColor: "#5d65f3",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  estimateBudgetButton: {
+    top: 10,
     backgroundColor: "#5d65f3",
     borderRadius: 10,
     paddingVertical: 14,
@@ -304,6 +340,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 16,
     fontWeight: "500",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.56)", // semi-transparent black
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
