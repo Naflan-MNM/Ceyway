@@ -30,8 +30,8 @@ const SummaryScreen = ({ navigation }) => {
     selectedItems.includes(Number(location.id))
   );
 
-  const handleCreatePlan = async () => {
-    const selectedAttractionsNames = destinations.map((item) => item.name);
+  /* const handleCreatePlan = async () => {
+    /*  const selectedAttractionsNames = destinations.map((item) => item.name);
     const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name);
     // Navigate to processing screen first
     navigation.navigate("ProcessingScreen");
@@ -50,7 +50,7 @@ const SummaryScreen = ({ navigation }) => {
         dates: {
           start: fromDate,
           end: toDate,
-        } */
+        } 
             start: "Anuradhapura",
             destination: "Trincomalee",
             /* selectedOnTheWay: ["Habarana", "Minneriya National Park"],
@@ -59,7 +59,7 @@ const SummaryScreen = ({ navigation }) => {
               "Duch bay beach ",
               "Lovers Leap",
               "Kanniya Hot Water Springs",
-            ], */
+            ], 
             selectedOnTheWay: selectedOnTheWayNames,
             selectedAttractions: selectedAttractionsNames,
           }),
@@ -75,7 +75,11 @@ const SummaryScreen = ({ navigation }) => {
     } catch (error) {
       console.error("Error creating plan:", error);
       // Optionally show error or retry option
-    }
+    } 
+  };
+ */
+  const handleCreatePlan = () => {
+    navigation.navigate("PlanByAIScreen");
   };
 
   const handleMemberEdit = () => {

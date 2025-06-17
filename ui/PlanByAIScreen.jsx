@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import {
   View,
   Text,
@@ -6,14 +6,134 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Modal,
 } from "react-native";
 import { CeywayContext } from "../context/CeywayContext";
 
+// Import your TripDayDetails component
+import TripDayDetails from "../components/TripDayDetails.jsx";
+
 const PlanByAIScreen = ({ route, navigation }) => {
   const { fromDate, toDate, members, vehicle } = useContext(CeywayContext);
-  const { planData } = route.params;
-  const { tripPlan } = planData.data;
-  console.log(tripPlan);
+  /* const { planData } = route.params;
+  const { tripPlan } = planData.data; */
+  const tripPlan = {
+    data: {
+      tripPlan: {
+        tripDuration: "2 days",
+        estimatedBudget: {
+          transportation: "LKR 25000",
+          accommodation: "LKR 30000",
+          food: "LKR 10000",
+          activities: "LKR 15000",
+          total: "LKR 80000",
+        },
+        weatherSummary: {
+          "2025-04-10": {
+            location: "Anuradhapura",
+            description: "overcast clouds",
+            temperature: 26.3,
+            humidity: 80,
+            windSpeed: 5.6,
+          },
+          "2025-04-11": {
+            location: "Trincomalee",
+            description: "broken clouds",
+            temperature: 28.7,
+            humidity: 70,
+            windSpeed: 6.4,
+          },
+        },
+        weatherAssessment:
+          "The weather is suitable for travel with some cloud cover but no rain expected.",
+        itinerary: [
+          {
+            day: "Day 1",
+            date: "2025-04-10",
+            weather: {
+              description: "overcast clouds",
+              temperature: 26.3,
+            },
+            activities: [
+              {
+                time: "9:00 AM",
+                place: "Habarana",
+                duration: "1 hour",
+                distance: "45 km",
+                travelTime: "1 hour",
+              },
+              {
+                time: "11:00 AM",
+                place: "Minneriya National Park",
+                duration: "2 hours",
+              },
+            ],
+          },
+          {
+            day: "Day 2",
+            date: "2025-04-11",
+            weather: {
+              description: "broken clouds",
+              temperature: 28.7,
+            },
+            activities: [
+              {
+                time: "9:00 AM",
+                place: "Marble Beach",
+                duration: "2 hours",
+                distance: "120 km",
+                travelTime: "2 hours",
+              },
+              {
+                time: "12:00 PM",
+                place: "Dutch Bay Beach",
+                duration: "1 hour",
+              },
+              {
+                time: "2:00 PM",
+                place: "Lovers Leap",
+                duration: "1 hour",
+              },
+              {
+                time: "4:00 PM",
+                place: "Kanniya Hot Water Springs",
+                duration: "1 hour",
+              },
+            ],
+          },
+        ],
+      },
+      start: "Anuradhapura",
+      selectedAttractions: [
+        "Marble Beach",
+        "Dutch Bay Beach",
+        "Lovers Leap",
+        "Kanniya Hot Water Springs",
+      ],
+      endDate: "2025-04-11",
+      selectedOnTheWay: ["Habarana", "Minneriya National Park"],
+      vehicleType: "SUV",
+      numOfMembers: 4,
+      startDate: "2025-04-10",
+      destination: "Trincomalee",
+    },
+    message: "Trip plan generated successfully",
+    status: "success",
+  };
+
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openDetails = (dayItem) => {
+    setSelectedDay(dayItem);
+    setModalVisible(true);
+  };
+
+  const closeDetails = () => {
+    setSelectedDay(null);
+    setModalVisible(false);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -30,16 +150,16 @@ const PlanByAIScreen = ({ route, navigation }) => {
           </Text>
         </View>
 
-        {/* Render each day of trip plan */}
-        {tripPlan?.days.map((dayItem, index) => (
+        {/* Show each day */}
+        {tripPlan?.data?.tripPlan?.itinerary?.map((dayItem, index) => (
           <View key={index}>
             <Text style={styles.dayText}>
-              Day {index + 1} - {dayItem.date}
+              {dayItem.day} - {dayItem.date}
             </Text>
             {dayItem.activities.map((activity, idx) => (
               <View key={idx} style={styles.destinationCard}>
                 <Image
-                  source={{ uri: "https://i.imgur.com/NjEdKbb.jpg" }} // or replace this with a dynamic or placeholder image url
+                  source={{ uri: "https://i.imgur.com/NjEdKbb.jpg" }}
                   style={styles.image}
                 />
                 <View style={styles.destinationContent}>
@@ -48,19 +168,38 @@ const PlanByAIScreen = ({ route, navigation }) => {
                   <Text style={styles.destinationDetail}>
                     • Duration: {activity.duration}
                   </Text>
-                  <Text style={styles.destinationDetail}>
-                    • Distance: {activity.distance}
-                  </Text>
-                  <Text style={styles.destinationDetail}>
-                    • Travel Time: {activity.travelTime}
-                  </Text>
-                  <Text style={styles.linkText}>more details</Text>
+                  {activity.distance && (
+                    <Text style={styles.destinationDetail}>
+                      • Distance: {activity.distance}
+                    </Text>
+                  )}
+                  {activity.travelTime && (
+                    <Text style={styles.destinationDetail}>
+                      • Travel Time: {activity.travelTime}
+                    </Text>
+                  )}
+                  <TouchableOpacity onPress={() => openDetails(dayItem)}>
+                    <Text style={styles.linkText}>more details</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
           </View>
         ))}
       </ScrollView>
+
+      {/* Detailed View Modal */}
+      <Modal visible={modalVisible} animationType="slide">
+        {selectedDay && (
+          <TripDayDetails
+            dayData={selectedDay}
+            weather={
+              tripPlan.data?.tripPlan?.weatherSummary?.[selectedDay?.date]
+            }
+            onClose={closeDetails}
+          />
+        )}
+      </Modal>
 
       <TouchableOpacity style={styles.shareButton}>
         <Text style={styles.shareText}>Share</Text>
