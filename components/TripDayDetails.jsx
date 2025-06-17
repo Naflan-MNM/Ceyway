@@ -76,16 +76,20 @@ const TripDayDetails = ({ dayData, activity, weather, onClose }) => {
           {dayData.day} - {dayData.date}
         </Text>
 
-        <Text style={styles.weather}>
-          Weather: {weather.description}, {weather.temperature}°C
-        </Text>
-
         {activity && (
           <View>
-            <Text style={styles.sectionTitle}>
-              <Ionicons name="location-outline" size={16} color="#333" />
-              {"  "}Place: {activity.place}
-            </Text>
+            <View style={styles.sectionTitleContainer}>
+              <Text style={styles.sectionTitle}>
+                {/* <Ionicons name="location-outline" size={16} color="#333" /> */}
+                {"  "}
+                {activity.place}
+                {"  "}
+              </Text>
+              <View style={styles.verticalLine} />
+              <Text style={styles.weather}>
+                {weather.description}, {weather.temperature}°C
+              </Text>
+            </View>
             <View style={styles.activityItem}>
               <Text style={styles.activityText}>
                 {activity.time ? `🕘 Time: ${activity.time}\n` : ""}
@@ -123,13 +127,21 @@ const styles = StyleSheet.create({
     marginTop: height * 0.1, // Add top margin to simulate vertical centering
   },
   animationWrapper: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 70,
+    right: 0,
+    bottom: 0,
+    left: 0,
     borderRadius: 20,
     overflow: "hidden", // Ensure animation is clipped within rounded border
     zIndex: -1,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 70,
+    right: 0,
+    bottom: 0,
+    left: 0,
     backgroundColor: "rgba(255, 255, 255, 0.7)",
   },
   content: {
@@ -142,24 +154,30 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   title: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "700",
     marginBottom: 4,
     color: "#333",
   },
-  weather: {
-    fontSize: 14,
-    color: "#666",
-    marginBottom: 10,
+  sectionTitleContainer: {
+    flexDirection: "row",
+    alignItems: "center",
   },
   sectionTitle: {
-    marginTop: 10,
-    fontSize: 18,
-    fontWeight: "600",
-    borderBottomWidth: 1.5,
-    borderColor: "#ccc",
     paddingBottom: 6,
-    marginBottom: 8,
+    paddingTop: 6,
+    backgroundColor: "rgb(11, 33, 159)",
+    borderRadius: 20,
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff" /* 
+    paddingBottom: 6,
+    marginBottom: 8, */,
+  },
+  weather: {
+    fontSize: 18,
+    color: "rgb(11, 33, 159)",
+    fontWeight: "medium-bold",
   },
   activityItem: {
     marginLeft: 4,
@@ -181,6 +199,18 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "600",
     fontSize: 16,
+  },
+  horizontalLine: {
+    height: 1,
+    backgroundColor: "#ccc",
+    alignSelf: "stretch",
+    marginVertical: 6,
+  },
+  verticalLine: {
+    width: 2,
+    height: 26,
+    backgroundColor: "rgb(11, 33, 159)",
+    marginHorizontal: 8,
   },
 });
 
