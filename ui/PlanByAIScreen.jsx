@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { CeywayContext } from "../context/CeywayContext";
 import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
+import { Share } from "react-native";
 
 // Import your TripDayDetails component
 import TripDayDetails from "../components/TripDayDetails.jsx";
@@ -145,6 +146,30 @@ const PlanByAIScreen = ({ route, navigation }) => {
   const closeBudgetModal = () => {
     setBudgetModalVisible(false);
   };
+
+  const handleShare = async () => {
+    const plan = tripPlan?.data?.tripPlan;
+    const start = tripPlan?.data?.start;
+    const destination = tripPlan?.data?.destination;
+
+    let message = `🚗 CEYWAY Trip Plan\nFrom: ${start} → ${destination}\n📅 ${fromDate} - ${toDate}\n👥 Members: ${members}\n\nItinerary:\n`;
+
+    plan?.itinerary?.forEach((day) => {
+      message += `\n📌 ${day.day} (${day.date}):\n`;
+      day.activities.forEach((act) => {
+        message += `  • ${act.time} - ${act.place} (${act.duration})\n`;
+      });
+    });
+
+    message += `\n💰 Estimated Budget: ${plan.estimatedBudget.total}`;
+
+    try {
+      await Share.share({ message });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -205,7 +230,7 @@ const PlanByAIScreen = ({ route, navigation }) => {
         >
           <Text style={styles.shareText}>Estimated Budget</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareButton}>
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Text style={styles.shareText}>Share</Text>
         </TouchableOpacity>
       </ScrollView>
