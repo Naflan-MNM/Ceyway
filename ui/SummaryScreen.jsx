@@ -21,6 +21,7 @@ const SummaryScreen = ({ navigation }) => {
     vehicle,
     LOCAL_IP,
     setActiveTab,
+    totalmembers,
   } = useContext(CeywayContext);
 
   const destinations = destinationData.filter((location) =>
@@ -30,9 +31,9 @@ const SummaryScreen = ({ navigation }) => {
     selectedItems.includes(Number(location.id))
   );
 
-  /* const handleCreatePlan = async () => {
-    /*  const selectedAttractionsNames = destinations.map((item) => item.name);
-    const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name);
+  const handleCreatePlan = async () => {
+    /*  const selectedAttractionsNames = destinations.map((item) => item.name); //currently this is not in use but this is mendatory
+    const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name); */
     // Navigate to processing screen first
     navigation.navigate("ProcessingScreen");
 
@@ -45,27 +46,24 @@ const SummaryScreen = ({ navigation }) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            /* members: members,
-        vehicle: vehicle,
-        dates: {
-          start: fromDate,
-          end: toDate,
-        } 
+            numOfMembers: totalmembers,
+            vehicleType: vehicle,
+            startDate: fromDate,
+            endDate: toDate,
             start: "Anuradhapura",
             destination: "Trincomalee",
-            /* selectedOnTheWay: ["Habarana", "Minneriya National Park"],
+            selectedOnTheWay: ["Habarana", "Minneriya National Park"], // Fixed key
             selectedAttractions: [
               "Marble Beach",
-              "Duch bay beach ",
+              "Dutch Bay Beach",
               "Lovers Leap",
               "Kanniya Hot Water Springs",
-            ], 
-            selectedOnTheWay: selectedOnTheWayNames,
-            selectedAttractions: selectedAttractionsNames,
+            ],
           }),
         }
       );
-
+      /*  selectedOnTheWay: selectedOnTheWayNames, this is the actual selected attractions now you have just using hard code in above code 
+            selectedAttractions: selectedAttractionsNames, */
       const sheduleData = await response.json();
       console.log(sheduleData);
       // Add slight delay to simulate processing screen (optional)
@@ -75,12 +73,12 @@ const SummaryScreen = ({ navigation }) => {
     } catch (error) {
       console.error("Error creating plan:", error);
       // Optionally show error or retry option
-    } 
+    }
   };
- */
-  const handleCreatePlan = () => {
+
+  /* const handleCreatePlan = () => {
     navigation.navigate("PlanByAIScreen");
-  };
+  }; */
 
   const handleMemberEdit = () => {
     navigation.goBack();

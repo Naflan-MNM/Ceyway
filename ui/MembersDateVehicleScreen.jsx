@@ -78,7 +78,7 @@ const MembersDateVehicleScreen = ({ navigation }) => {
       setSelectedDates(newSelected);
     }
   };
-
+  console.log("members", members);
   // Set initial selectedDates to include today's date
   useEffect(() => {
     let today = new Date().toISOString().split("T")[0];

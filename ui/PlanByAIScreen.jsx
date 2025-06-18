@@ -7,121 +7,17 @@ import {
   Image,
   TouchableOpacity,
   Modal,
+  Share,
 } from "react-native";
 import { CeywayContext } from "../context/CeywayContext";
 import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
-import { Share } from "react-native";
-
-// Import your TripDayDetails component
 import TripDayDetails from "../components/TripDayDetails.jsx";
 
 const PlanByAIScreen = ({ route, navigation }) => {
   const { fromDate, toDate, members, vehicle } = useContext(CeywayContext);
-  /* const { planData } = route.params;
-  const { tripPlan } = planData.data; */
-  const tripPlan = {
-    data: {
-      tripPlan: {
-        tripDuration: "2 days",
-        estimatedBudget: {
-          transportation: "LKR 25000",
-          accommodation: "LKR 30000",
-          food: "LKR 10000",
-          activities: "LKR 15000",
-          total: "LKR 80000",
-        },
-        weatherSummary: {
-          "2025-04-10": {
-            location: "Anuradhapura",
-            description: "rainy",
-            temperature: 26.3,
-            humidity: 80,
-            windSpeed: 5.6,
-          },
-          "2025-04-11": {
-            location: "Trincomalee",
-            description: "rainy",
-            temperature: 28.7,
-            humidity: 70,
-            windSpeed: 6.4,
-          },
-        },
-        weatherAssessment:
-          "The weather is suitable for travel with some cloud cover but no rain expected.",
-        itinerary: [
-          {
-            day: "Day 1",
-            date: "2025-04-10",
-            weather: {
-              description: "overcast clouds",
-              temperature: 26.3,
-            },
-            activities: [
-              {
-                time: "9:00 AM",
-                place: "Habarana",
-                duration: "1 hour",
-                distance: "45 km",
-                travelTime: "1 hour",
-              },
-              {
-                time: "11:00 AM",
-                place: "Minneriya National Park",
-                duration: "2 hours",
-              },
-            ],
-          },
-          {
-            day: "Day 2",
-            date: "2025-04-11",
-            weather: {
-              description: "broken clouds",
-              temperature: 28.7,
-            },
-            activities: [
-              {
-                time: "9:00 AM",
-                place: "Marble Beach",
-                duration: "2 hours",
-                distance: "120 km",
-                travelTime: "2 hours",
-              },
-              {
-                time: "12:00 PM",
-                place: "Dutch Bay Beach",
-                duration: "1 hour",
-              },
-              {
-                time: "2:00 PM",
-                place: "Lovers Leap",
-                duration: "1 hour",
-              },
-              {
-                time: "4:00 PM",
-                place: "Kanniya Hot Water Springs",
-                duration: "1 hour",
-              },
-            ],
-          },
-        ],
-      },
-      start: "Anuradhapura",
-      selectedAttractions: [
-        "Marble Beach",
-        "Dutch Bay Beach",
-        "Lovers Leap",
-        "Kanniya Hot Water Springs",
-      ],
-      endDate: "2025-04-11",
-      selectedOnTheWay: ["Habarana", "Minneriya National Park"],
-      vehicleType: "SUV",
-      numOfMembers: 4,
-      startDate: "2025-04-10",
-      destination: "Trincomalee",
-    },
-    message: "Trip plan generated successfully",
-    status: "success",
-  };
+  const { planData } = route.params;
+
+  console.log("Schedule data", planData.data);
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -139,23 +35,19 @@ const PlanByAIScreen = ({ route, navigation }) => {
     setSelectedActivity(null);
     setModalVisible(false);
   };
-  const openBudgetModal = () => {
-    setBudgetModalVisible(true);
-  };
 
-  const closeBudgetModal = () => {
-    setBudgetModalVisible(false);
-  };
+  const openBudgetModal = () => setBudgetModalVisible(true);
+  const closeBudgetModal = () => setBudgetModalVisible(false);
 
   const handleShare = async () => {
-    const plan = tripPlan?.data?.tripPlan;
-    const start = tripPlan?.data?.start;
-    const destination = tripPlan?.data?.destination;
+    const plan = planData?.data?.tripPlan;
+    const start = planData?.data?.start;
+    const destination = planData?.data?.destination;
 
     let message = `🚗 CEYWAY Trip Plan\nFrom: ${start} → ${destination}\n📅 ${fromDate} - ${toDate}\n👥 Members: ${members}\n\nItinerary:\n`;
 
-    plan?.itinerary?.forEach((day) => {
-      message += `\n📌 ${day.day} (${day.date}):\n`;
+    plan?.itinerary?.forEach((day, index) => {
+      message += `\n📌 Day ${index + 1} (${day.date}):\n`;
       day.activities.forEach((act) => {
         message += `  • ${act.time} - ${act.place} (${act.duration})\n`;
       });
@@ -169,6 +61,8 @@ const PlanByAIScreen = ({ route, navigation }) => {
       console.error("Error sharing:", error);
     }
   };
+
+  const tripPlan = planData?.data?.tripPlan;
 
   return (
     <View style={styles.container}>
@@ -186,13 +80,13 @@ const PlanByAIScreen = ({ route, navigation }) => {
           </Text>
         </View>
 
-        {/* Show each day */}
-        {tripPlan?.data?.tripPlan?.itinerary?.map((dayItem, index) => (
+        {/* Trip Days Rendering */}
+        {tripPlan?.itinerary?.map((dayItem, index) => (
           <View key={index}>
             <Text style={styles.dayText}>
-              {dayItem.day} - {dayItem.date}
+              Day {index + 1} - {dayItem.date}
             </Text>
-            {dayItem.activities.map((activity, idx) => (
+            {dayItem.activities?.map((activity, idx) => (
               <View key={idx} style={styles.destinationCard}>
                 <Image
                   source={{ uri: "https://i.imgur.com/NjEdKbb.jpg" }}
@@ -224,38 +118,38 @@ const PlanByAIScreen = ({ route, navigation }) => {
             ))}
           </View>
         ))}
+
         <TouchableOpacity
           style={styles.estimateBudgetButton}
           onPress={openBudgetModal}
         >
           <Text style={styles.shareText}>Estimated Budget</Text>
         </TouchableOpacity>
+
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Text style={styles.shareText}>Share</Text>
         </TouchableOpacity>
       </ScrollView>
 
-      {/* Detailed View Modal */}
+      {/* Details Modal */}
       <Modal visible={modalVisible} animationType="fade" transparent={true}>
         <View style={styles.modalOverlay}>
           {selectedDay && selectedActivity && (
             <TripDayDetails
               dayData={selectedDay}
               activity={selectedActivity}
-              weather={
-                tripPlan.data?.tripPlan?.weatherSummary?.[selectedDay?.date]
-              }
+              weather={tripPlan?.weatherSummary?.[selectedDay?.date]}
               onClose={closeDetails}
             />
           )}
         </View>
       </Modal>
 
-      {/* Estimated Budget Modal */}
+      {/* Budget Modal */}
       <EstimatedBudgetModal
         visible={budgetModalVisible}
         onClose={closeBudgetModal}
-        budget={tripPlan.data.tripPlan.estimatedBudget}
+        budget={tripPlan?.estimatedBudget}
       />
     </View>
   );
@@ -344,10 +238,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   shareButton: {
-    /* position: "absolute",
-    bottom: 20,
-    left: 16,
-    right: 16, */
     top: 20,
     backgroundColor: "#5d65f3",
     borderRadius: 10,
@@ -368,7 +258,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.56)", // semi-transparent black
+    backgroundColor: "rgba(0, 0, 0, 0.56)",
     justifyContent: "center",
     alignItems: "center",
   },
