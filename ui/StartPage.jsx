@@ -14,34 +14,9 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import FooterNavigation from "../components/FooterNavigation";
 import { CeywayContext } from "../context/CeywayContext";
+import districtCoords from "../data/sriLankaDistrictCoords.json";
 
-const sriLankaDistricts = [
-  "Colombo",
-  "Gampaha",
-  "Kalutara",
-  "Kandy",
-  "Matale",
-  "Nuwara Eliya",
-  "Galle",
-  "Matara",
-  "Hambantota",
-  "Jaffna",
-  "Kilinochchi",
-  "Mannar",
-  "Vavuniya",
-  "Mullaitivu",
-  "Batticaloa",
-  "Ampara",
-  "Trincomalee",
-  "Kurunegala",
-  "Puttalam",
-  "Anuradhapura",
-  "Polonnaruwa",
-  "Badulla",
-  "Moneragala",
-  "Ratnapura",
-  "Kegalle",
-];
+const districtCoordinates = Object.keys(districtCoords);
 
 const StartPage = ({ navigation, route }) => {
   const { setdestinationData, setOnTheWayData, LOCAL_IP } =
@@ -58,6 +33,13 @@ const StartPage = ({ navigation, route }) => {
     name: "",
   });
 
+  const [destinationDistrict, setDestinationDistrict] = useState({
+    latitude: null,
+    longitude: null,
+    distance: null,
+    name: "",
+  });
+  /* console.log("currentLocationData", destinationDistrict.latitude); */
   const trendingDestinations = [
     {
       id: "1",
@@ -114,12 +96,12 @@ const StartPage = ({ navigation, route }) => {
   }, [route.params]);
 
   const GoToStartPage2 = async () => {
-    /*if (!currentLocation || !destination) return;
+    /* if (!currentLocation || !destination) return; */
 
     setIsLoading(true);
     try {
       const destinationRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/get-attractions/${destination}`
+        `http://${LOCAL_IP}:8080/api/travel-app/attractions/coords?lat=${currentLocationData.latitude}&lng=${currentLocationData.longitude}`
       );
       if (!destinationRes.ok) {
         const errorText = await destinationRes.text();
@@ -136,8 +118,8 @@ const StartPage = ({ navigation, route }) => {
       }
       const onTheWayData = await onTheWayRes.json();
 
-      setdestinationData(destinationData);
       setOnTheWayData(onTheWayData);
+      setdestinationData(destinationData);
 
       navigation.navigate("DestinationsScreen");
     } catch (err) {
@@ -152,8 +134,7 @@ const StartPage = ({ navigation, route }) => {
       );
     } finally {
       setIsLoading(false);
-    } */
-    navigation.navigate("DestinationsScreen");
+    }
   };
 
   return (
@@ -195,10 +176,18 @@ const StartPage = ({ navigation, route }) => {
             onChangeText={(text) => {
               const formatted = toTitleCase(text);
               setDestination(formatted);
-              const filtered = sriLankaDistricts.filter((d) =>
+              const filtered = districtCoordinates.filter((d) =>
                 d.toLowerCase().startsWith(formatted.toLowerCase())
               );
               setSuggestedDistricts(formatted ? filtered : []);
+              // If valid district, set coordinates
+              if (districtCoordinates[formatted]) {
+                setDestinationDistrict({
+                  ...districtCoordinates[formatted],
+                  name: formatted,
+                  distance: null,
+                });
+              }
             }}
           />
         </View>
