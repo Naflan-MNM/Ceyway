@@ -108,6 +108,20 @@ const CeywayContextProvider = (props) => {
   /* used in inthe summary screen, destinatons screen */
   const [activeTab, setActiveTab] = useState("Destinations");
 
+  const [currentLocationData, setCurrentLocationData] = useState({
+    latitude: null,
+    longitude: null,
+    distance: null,
+    name: "",
+  });
+
+  const [destinationDistrict, setDestinationDistrict] = useState({
+    latitude: null,
+    longitude: null,
+    distance: null,
+    name: "",
+  });
+
   /* // Filter the LocationData into two arrays: Jaffna and On the way
     const destinationData = LocationData.filter(item => item.location === 'Jaffna');
     const onTheWayData = LocationData.filter(item => item.location === 'On the way'); */
@@ -136,6 +150,10 @@ const CeywayContextProvider = (props) => {
     LOCAL_IP,
     activeTab,
     totalmembers,
+    destinationDistrict,
+    currentLocationData,
+    setCurrentLocationData,
+    setDestinationDistrict,
     toggleSelection,
     setToDate,
     setFromDate,

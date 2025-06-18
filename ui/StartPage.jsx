@@ -19,27 +19,22 @@ import districtCoords from "../data/sriLankaDistrictCoords.json";
 const districtCoordinates = Object.keys(districtCoords);
 
 const StartPage = ({ navigation, route }) => {
-  const { setdestinationData, setOnTheWayData, LOCAL_IP } =
-    useContext(CeywayContext);
+  const {
+    setdestinationData,
+    setOnTheWayData,
+    LOCAL_IP,
+    currentLocationData,
+    setCurrentLocationData,
+    destinationDistrict,
+    setDestinationDistrict,
+  } = useContext(CeywayContext);
   const [currentLocation, setCurrentLocation] = useState("");
   const [destination, setDestination] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedDistricts, setSuggestedDistricts] = useState([]);
 
-  const [currentLocationData, setCurrentLocationData] = useState({
-    latitude: null,
-    longitude: null,
-    distance: null,
-    name: "",
-  });
-
-  const [destinationDistrict, setDestinationDistrict] = useState({
-    latitude: null,
-    longitude: null,
-    distance: null,
-    name: "",
-  });
-  /* console.log("currentLocationData", destinationDistrict.latitude); */
+  console.log("currentLocationData", currentLocationData);
+  console.log("destinationdistrict", destinationDistrict);
   const trendingDestinations = [
     {
       id: "1",
@@ -96,8 +91,6 @@ const StartPage = ({ navigation, route }) => {
   }, [route.params]);
 
   const GoToStartPage2 = async () => {
-    /* if (!currentLocation || !destination) return; */
-
     setIsLoading(true);
     try {
       const destinationRes = await fetch(
@@ -110,7 +103,7 @@ const StartPage = ({ navigation, route }) => {
       const destinationData = await destinationRes.json();
 
       const onTheWayRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=${currentLocationData.latitude}&originLng=${currentLocationData.longitude}&destLat=8.5922&destLng=81.1968&maxDistanceKm=15`
+        `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=${currentLocationData.latitude}&originLng=${currentLocationData.longitude}&destLat=${destinationDistrict.latitude}&destLng=${destinationDistrict.longitude}&maxDistanceKm=15`
       );
       if (!onTheWayRes.ok) {
         const errorText = await onTheWayRes.text();
@@ -155,11 +148,7 @@ const StartPage = ({ navigation, route }) => {
               navigation.navigate("LocationPicker", { field: "current" })
             }
           >
-            <Text
-              style={{
-                color: currentLocation ? "#333" : "#888",
-              }}
-            >
+            <Text style={{ color: currentLocation ? "#333" : "#888" }}>
               {currentLocation || "Select current location"}
             </Text>
           </TouchableOpacity>
@@ -176,15 +165,22 @@ const StartPage = ({ navigation, route }) => {
             onChangeText={(text) => {
               const formatted = toTitleCase(text);
               setDestination(formatted);
+
               const filtered = districtCoordinates.filter((d) =>
                 d.toLowerCase().startsWith(formatted.toLowerCase())
               );
               setSuggestedDistricts(formatted ? filtered : []);
-              // If valid district, set coordinates
-              if (districtCoordinates[formatted]) {
+
+              const districtKey = Object.keys(districtCoords).find(
+                (d) => d.toLowerCase() === formatted.toLowerCase()
+              );
+
+              if (districtKey) {
+                const coords = districtCoords[districtKey];
                 setDestinationDistrict({
-                  ...districtCoordinates[formatted],
-                  name: formatted,
+                  latitude: coords.latitude,
+                  longitude: coords.longitude,
+                  name: districtKey,
                   distance: null,
                 });
               }
@@ -203,6 +199,15 @@ const StartPage = ({ navigation, route }) => {
                 onPress={() => {
                   setDestination(item);
                   setSuggestedDistricts([]);
+                  const coords = districtCoords[item];
+                  if (coords) {
+                    setDestinationDistrict({
+                      latitude: coords.latitude,
+                      longitude: coords.longitude,
+                      name: item,
+                      distance: null,
+                    });
+                  }
                 }}
               >
                 <Text style={styles.suggestionText}>{item}</Text>

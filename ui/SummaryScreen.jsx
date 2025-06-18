@@ -22,6 +22,8 @@ const SummaryScreen = ({ navigation }) => {
     LOCAL_IP,
     setActiveTab,
     totalmembers,
+    currentLocationData,
+    destinationDistrict,
   } = useContext(CeywayContext);
 
   const destinations = destinationData.filter((location) =>
@@ -32,8 +34,8 @@ const SummaryScreen = ({ navigation }) => {
   );
 
   const handleCreatePlan = async () => {
-    /*  const selectedAttractionsNames = destinations.map((item) => item.name); //currently this is not in use but this is mendatory
-    const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name); */
+    const selectedAttractionsNames = destinations.map((item) => item.name);
+    const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name);
     // Navigate to processing screen first
     navigation.navigate("ProcessingScreen");
 
@@ -50,15 +52,12 @@ const SummaryScreen = ({ navigation }) => {
             vehicleType: vehicle,
             startDate: fromDate,
             endDate: toDate,
-            start: "Anuradhapura",
-            destination: "Trincomalee",
-            selectedOnTheWay: ["Habarana", "Minneriya National Park"], // Fixed key
-            selectedAttractions: [
-              "Marble Beach",
-              "Dutch Bay Beach",
-              "Lovers Leap",
-              "Kanniya Hot Water Springs",
-            ],
+            startLat: currentLocationData.latitude,
+            startLon: currentLocationData.longitude,
+            destinationLat: destinationDistrict.latitude,
+            destinationLon: destinationDistrict.longitude,
+            selectedOnTheWay: selectedOnTheWayNames, // Fixed key
+            selectedAttractions: selectedAttractionsNames,
           }),
         }
       );
