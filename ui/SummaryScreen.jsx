@@ -133,7 +133,10 @@ const SummaryScreen = ({ navigation }) => {
             </View>
             {destinations.map((item) => (
               <View key={item.id} style={styles.destinationCard}>
-                <Image source={item.image} style={styles.destinationImage} />
+                <Image
+                  source={item.imagePath}
+                  style={styles.destinationImage}
+                />
                 <View>
                   <Text style={styles.destinationName}>{item.name}</Text>
                   <Text style={styles.destinationDetail}>
@@ -158,7 +161,10 @@ const SummaryScreen = ({ navigation }) => {
             </View>
             {onTheWayDestinations.map((item) => (
               <View key={item.id} style={styles.destinationCard}>
-                <Image source={item.image} style={styles.destinationImage} />
+                <Image
+                  source={item.imagePath}
+                  style={styles.destinationImage}
+                />
                 <View>
                   <Text style={styles.destinationName}>{item.name}</Text>
                   <Text style={styles.destinationDetail}>

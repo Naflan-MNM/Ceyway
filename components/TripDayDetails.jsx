@@ -8,7 +8,6 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 import LottieView from "lottie-react-native";
 
 const { width, height } = Dimensions.get("window");
@@ -67,7 +66,7 @@ const TripDayDetails = ({ dayData, activity, weather, onClose }) => {
 
       <ScrollView contentContainerStyle={styles.content}>
         <Image
-          source={require("../assets/images/sigiriye.jpeg")}
+          source={activity.imagePath}
           style={styles.image}
           resizeMode="cover"
         />
@@ -80,7 +79,6 @@ const TripDayDetails = ({ dayData, activity, weather, onClose }) => {
           <View>
             <View style={styles.sectionTitleContainer}>
               <Text style={styles.sectionTitle}>
-                {/* <Ionicons name="location-outline" size={16} color="#333" /> */}
                 {"  "}
                 {activity.place}
                 {"  "}

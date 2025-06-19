@@ -88,10 +88,7 @@ const PlanByAIScreen = ({ route, navigation }) => {
             </Text>
             {dayItem.activities?.map((activity, idx) => (
               <View key={idx} style={styles.destinationCard}>
-                <Image
-                  source={{ uri: "https://i.imgur.com/NjEdKbb.jpg" }}
-                  style={styles.image}
-                />
+                <Image source={activity.imagePath} style={styles.image} />
                 <View style={styles.destinationContent}>
                   <Text style={styles.destinationTitle}>{activity.place}</Text>
                   <Text style={styles.timeSlot}>{activity.time}</Text>
