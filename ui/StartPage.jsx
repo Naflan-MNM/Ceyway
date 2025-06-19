@@ -32,9 +32,6 @@ const StartPage = ({ navigation, route }) => {
   const [destination, setDestination] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [suggestedDistricts, setSuggestedDistricts] = useState([]);
-
-  console.log("currentLocationData", currentLocationData);
-  console.log("destinationdistrict", destinationDistrict);
   const trendingDestinations = [
     {
       id: "1",
@@ -76,7 +73,8 @@ const StartPage = ({ navigation, route }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-
+  console.log("currentLocationData", currentLocationData);
+  console.log("destinationDistrict", destinationDistrict);
   useEffect(() => {
     if (route.params?.currentCoords) {
       setCurrentLocationData((prev) => ({
@@ -94,13 +92,14 @@ const StartPage = ({ navigation, route }) => {
     setIsLoading(true);
     try {
       const destinationRes = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/attractions/coords?lat=${currentLocationData.latitude}&lng=${currentLocationData.longitude}`
+        `http://${LOCAL_IP}:8080/api/travel-app/attractions/coords?lat=${destinationDistrict.latitude}&lng=${destinationDistrict.longitude}`
       );
       if (!destinationRes.ok) {
         const errorText = await destinationRes.text();
         throw new Error(`Destination fetch failed: ${errorText}`);
       }
       const destinationData = await destinationRes.json();
+      setdestinationData(destinationData);
 
       const onTheWayRes = await fetch(
         `http://${LOCAL_IP}:8080/api/travel-app/route/nearby-attractions?originLat=${currentLocationData.latitude}&originLng=${currentLocationData.longitude}&destLat=${destinationDistrict.latitude}&destLng=${destinationDistrict.longitude}&maxDistanceKm=15`
@@ -112,7 +111,6 @@ const StartPage = ({ navigation, route }) => {
       const onTheWayData = await onTheWayRes.json();
 
       setOnTheWayData(onTheWayData);
-      setdestinationData(destinationData);
 
       navigation.navigate("DestinationsScreen");
     } catch (err) {

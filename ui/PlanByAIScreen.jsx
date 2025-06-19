@@ -8,13 +8,15 @@ import {
   TouchableOpacity,
   Modal,
   Share,
+  Linking,
 } from "react-native";
 import { CeywayContext } from "../context/CeywayContext";
 import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
 import TripDayDetails from "../components/TripDayDetails.jsx";
 
 const PlanByAIScreen = ({ route, navigation }) => {
-  const { fromDate, toDate, members, vehicle } = useContext(CeywayContext);
+  const { fromDate, toDate, members, vehicle, LOCAL_IP } =
+    useContext(CeywayContext);
   const { planData } = route.params;
 
   console.log("Schedule data", planData.data);
@@ -34,6 +36,61 @@ const PlanByAIScreen = ({ route, navigation }) => {
     setSelectedDay(null);
     setSelectedActivity(null);
     setModalVisible(false);
+  };
+
+  const handlegenRoute = async () => {
+    try {
+      /* const plan = planData?.data?.tripPlan;
+      if (!plan || !plan.itinerary) return;
+
+      const allPlaces = plan.itinerary.flatMap((day) =>
+        day.activities.map((act) => act.place)
+      ); */
+
+      const response = await fetch(
+        `http://${LOCAL_IP}:8080/api/travel-app/route/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify([
+            "Marble Beach",
+            "Kanniya Hot Water Springs",
+            "Dutch Bay Beach",
+          ]),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch route from backend.");
+      }
+
+      const orderedRoute = await response.json(); // expected: ["Marble Beach", "Kanniya Hot Water Springs", "Dutch Bay Beach"]
+      if (orderedRoute.length < 2) {
+        alert("Insufficient route data.");
+        return;
+      }
+
+      const origin = encodeURIComponent(orderedRoute[0]);
+      const destination = encodeURIComponent(
+        orderedRoute[orderedRoute.length - 1]
+      );
+      const waypoints = orderedRoute
+        .slice(1, -1)
+        .map(encodeURIComponent)
+        .join("|");
+
+      const mapsURL = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${
+        waypoints ? `&waypoints=${waypoints}` : ""
+      }`;
+
+      // Open URL
+      Linking.openURL(mapsURL);
+    } catch (error) {
+      console.error("Route generation failed:", error);
+      alert("Unable to generate route. Please try again.");
+    }
   };
 
   const openBudgetModal = () => setBudgetModalVisible(true);
@@ -125,6 +182,9 @@ const PlanByAIScreen = ({ route, navigation }) => {
 
         <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
           <Text style={styles.shareText}>Share</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.genButton} onPress={handlegenRoute}>
+          <Text style={styles.shareText}>Generate Route</Text>
         </TouchableOpacity>
       </ScrollView>
 
@@ -236,6 +296,13 @@ const styles = StyleSheet.create({
   },
   shareButton: {
     top: 20,
+    backgroundColor: "#5d65f3",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  genButton: {
+    top: 30,
     backgroundColor: "#5d65f3",
     borderRadius: 10,
     paddingVertical: 14,

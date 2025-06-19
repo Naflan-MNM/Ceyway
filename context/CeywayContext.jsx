@@ -165,7 +165,8 @@ const CeywayContextProvider = (props) => {
     setOnTheWayData,
     setActiveTab,
   };
-  console.log("totalmembers", totalmembers);
+
+  console.log("selected items", selectedItems);
   return (
     <CeywayContext.Provider value={value}>
       {props.children}
