@@ -107,6 +107,7 @@ const CeywayContextProvider = (props) => {
   const [onTheWayData, setOnTheWayData] = useState([]);
   /* used in inthe summary screen, destinatons screen */
   const [activeTab, setActiveTab] = useState("Destinations");
+  const [combinedDestinationNames, setCombinedDestinationNames] = useState([]);
 
   const [currentLocationData, setCurrentLocationData] = useState({
     latitude: null,
@@ -152,6 +153,8 @@ const CeywayContextProvider = (props) => {
     totalmembers,
     destinationDistrict,
     currentLocationData,
+    combinedDestinationNames,
+    setCombinedDestinationNames,
     setCurrentLocationData,
     setDestinationDistrict,
     toggleSelection,

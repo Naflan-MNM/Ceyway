@@ -15,11 +15,15 @@ import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
 import TripDayDetails from "../components/TripDayDetails.jsx";
 
 const PlanByAIScreen = ({ route, navigation }) => {
-  const { fromDate, toDate, members, vehicle, LOCAL_IP } =
-    useContext(CeywayContext);
+  const {
+    fromDate,
+    toDate,
+    members,
+    vehicle,
+    LOCAL_IP,
+    combinedDestinationNames,
+  } = useContext(CeywayContext);
   const { planData } = route.params;
-
-  console.log("Schedule data", planData.data);
 
   const [selectedDay, setSelectedDay] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -40,59 +44,38 @@ const PlanByAIScreen = ({ route, navigation }) => {
 
   const handlegenRoute = async () => {
     try {
-      /* const plan = planData?.data?.tripPlan;
-      if (!plan || !plan.itinerary) return;
+      if (!combinedDestinationNames || combinedDestinationNames.length < 2) {
+        alert("Not enough destinations to generate a route.");
+        return;
+      }
 
-      const allPlaces = plan.itinerary.flatMap((day) =>
-        day.activities.map((act) => act.place)
-      ); */
-
-      const response = await fetch(
-        `http://${LOCAL_IP}:8080/api/travel-app/route/generate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify([
-            "Marble Beach",
-            "Kanniya Hot Water Springs",
-            "Dutch Bay Beach",
-          ]),
-        }
-      );
+      const response = await fetch(`http://${LOCAL_IP}:8080/googlemaps/route`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(combinedDestinationNames),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to fetch route from backend.");
       }
 
-      const orderedRoute = await response.json(); // expected: ["Marble Beach", "Kanniya Hot Water Springs", "Dutch Bay Beach"]
-      if (orderedRoute.length < 2) {
-        alert("Insufficient route data.");
+      const mapsURL = await response.text(); // response is a plain string link
+
+      if (!mapsURL.startsWith("https://www.google.com/maps/dir/")) {
+        alert("Invalid route URL received from server.");
         return;
       }
 
-      const origin = encodeURIComponent(orderedRoute[0]);
-      const destination = encodeURIComponent(
-        orderedRoute[orderedRoute.length - 1]
-      );
-      const waypoints = orderedRoute
-        .slice(1, -1)
-        .map(encodeURIComponent)
-        .join("|");
-
-      const mapsURL = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${
-        waypoints ? `&waypoints=${waypoints}` : ""
-      }`;
-
-      // Open URL
       Linking.openURL(mapsURL);
+      console.log(mapsURL);
     } catch (error) {
       console.error("Route generation failed:", error);
       alert("Unable to generate route. Please try again.");
     }
   };
-
+  console.log(combinedDestinationNames);
   const openBudgetModal = () => setBudgetModalVisible(true);
   const closeBudgetModal = () => setBudgetModalVisible(false);
 

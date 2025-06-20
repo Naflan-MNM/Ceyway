@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -24,7 +24,15 @@ const SummaryScreen = ({ navigation }) => {
     totalmembers,
     currentLocationData,
     destinationDistrict,
+    setCombinedDestinationNames,
   } = useContext(CeywayContext);
+  useEffect(() => {
+    const names = [
+      ...destinations.map((item) => item.name),
+      ...onTheWayDestinations.map((item) => item.name),
+    ];
+    setCombinedDestinationNames(names);
+  }, [selectedItems, destinationData, onTheWayData]);
 
   const destinations = destinationData.filter((location) =>
     selectedItems.includes(Number(location.id))
@@ -33,6 +41,7 @@ const SummaryScreen = ({ navigation }) => {
     selectedItems.includes(Number(location.id))
   );
 
+  console.log("selected destinations", destinations);
   const handleCreatePlan = async () => {
     const selectedAttractionsNames = destinations.map((item) => item.name);
     const selectedOnTheWayNames = onTheWayDestinations.map((item) => item.name);
