@@ -73,8 +73,8 @@ const StartPage = ({ navigation, route }) => {
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
   };
-  console.log("currentLocationData", currentLocationData);
-  console.log("destinationDistrict", destinationDistrict);
+  /* console.log("currentLocationData", currentLocationData); */
+  /* console.log("destinationDistrict", destinationDistrict); */
   useEffect(() => {
     if (route.params?.currentCoords) {
       setCurrentLocationData((prev) => ({
@@ -90,6 +90,20 @@ const StartPage = ({ navigation, route }) => {
 
   const GoToStartPage2 = async () => {
     setIsLoading(true);
+    if (!currentLocationData.latitude || !currentLocationData.longitude) {
+      Alert.alert("Error", "Please select your current location.", [
+        { text: "Cancel", style: "cancel" },
+        { text: "Retry", onPress: GoToStartPage2 },
+      ]);
+      return;
+    }
+    if (!destinationDistrict.latitude || !destinationDistrict.longitude) {
+      Alert.alert("Error", "Please select your destination.", [
+        { text: "Cancel", style: "cancel" },
+        { text: "Retry", onPress: GoToStartPage2 },
+      ]);
+      return;
+    }
     try {
       const destinationRes = await fetch(
         `http://${LOCAL_IP}:8080/api/travel-app/attractions/coords?lat=${destinationDistrict.latitude}&lng=${destinationDistrict.longitude}`
