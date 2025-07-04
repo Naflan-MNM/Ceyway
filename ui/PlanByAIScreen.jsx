@@ -1,46 +1,109 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Share,
+  Linking,
+} from "react-native";
+import { CeywayContext } from "../context/CeywayContext";
+import EstimatedBudgetModal from "../components/EstimatedBudgetModal";
+import TripDayDetails from "../components/TripDayDetails.jsx";
 
-const mockData = {
-  members: '3 Adults',
-  vehicle: 'Car',
-  dateRange: 'Fri 7 Feb - Sun 9 Feb',
-  plan: [
-    {
-      day: 'Day 1 - 21 Feb',
-      destinations: [
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg', // note we have to change this to our actual image url
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg',
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-      ],
-    },
-    {
-      day: 'Day 2 - 22 Feb',
-      destinations: [
-        {
-          title: 'Sigiriya Rock Fortress',
-          image: 'https://i.imgur.com/NjEdKbb.jpg',
-          distance: '10km from Dambulla',
-          duration: 'Approx. 10min',
-          timeSlot: '10:00 AM - 12:00 PM',
-        },
-      ],
-    },
-  ],
-};
+const PlanByAIScreen = ({ route, navigation }) => {
+  const {
+    fromDate,
+    toDate,
+    members,
+    vehicle,
+    LOCAL_IP,
+    combinedDestinationNames,
+  } = useContext(CeywayContext);
+  const { planData } = route.params;
 
-const PlanByAIScreen = ({ navigation  }) => {
+  const [selectedDay, setSelectedDay] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedActivity, setSelectedActivity] = useState(null);
+  const [budgetModalVisible, setBudgetModalVisible] = useState(false);
+
+  const openDetails = (dayItem, activity) => {
+    setSelectedDay(dayItem);
+    setSelectedActivity(activity);
+    setModalVisible(true);
+  };
+
+  const closeDetails = () => {
+    setSelectedDay(null);
+    setSelectedActivity(null);
+    setModalVisible(false);
+  };
+
+  const handlegenRoute = async () => {
+    try {
+      if (!combinedDestinationNames || combinedDestinationNames.length < 2) {
+        alert("Not enough destinations to generate a route.");
+        return;
+      }
+
+      const response = await fetch(`http://${LOCAL_IP}:8080/googlemaps/route`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(combinedDestinationNames),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch route from backend.");
+      }
+
+      const mapsURL = await response.text(); // response is a plain string link
+
+      if (!mapsURL.startsWith("https://www.google.com/maps/dir/")) {
+        alert("Invalid route URL received from server.");
+        return;
+      }
+
+      Linking.openURL(mapsURL);
+      console.log(mapsURL);
+    } catch (error) {
+      console.error("Route generation failed:", error);
+      alert("Unable to generate route. Please try again.");
+    }
+  };
+  console.log(combinedDestinationNames);
+  const openBudgetModal = () => setBudgetModalVisible(true);
+  const closeBudgetModal = () => setBudgetModalVisible(false);
+
+  const handleShare = async () => {
+    const plan = planData?.data?.tripPlan;
+    const start = planData?.data?.start;
+    const destination = planData?.data?.destination;
+
+    let message = `🚗 CEYWAY Trip Plan\nFrom: ${start} → ${destination}\n📅 ${fromDate} - ${toDate}\n👥 Members: ${members}\n\nItinerary:\n`;
+
+    plan?.itinerary?.forEach((day, index) => {
+      message += `\n📌 Day ${index + 1} (${day.date}):\n`;
+      day.activities.forEach((act) => {
+        message += `  • ${act.time} - ${act.place} (${act.duration})\n`;
+      });
+    });
+
+    message += `\n💰 Estimated Budget: ${plan.estimatedBudget.total}`;
+
+    try {
+      await Share.share({ message });
+    } catch (error) {
+      console.error("Error sharing:", error);
+    }
+  };
+
+  const tripPlan = planData?.data?.tripPlan;
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -50,33 +113,84 @@ const PlanByAIScreen = ({ navigation  }) => {
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.card}>
           <Text style={styles.sectionTitle}>Members, Date & Vehicle</Text>
-          <Text style={styles.text}>👤 {mockData.members}</Text>
-          <Text style={styles.text}>🚗 {mockData.vehicle}</Text>
-          <Text style={styles.text}>📅 {mockData.dateRange}</Text>
+          <Text style={styles.text}>👤 {members}</Text>
+          <Text style={styles.text}>🚗 {vehicle}</Text>
+          <Text style={styles.text}>
+            📅 {fromDate} - {toDate}
+          </Text>
         </View>
 
-        {mockData.plan.map((dayItem, index) => (
+        {/* Trip Days Rendering */}
+        {tripPlan?.itinerary?.map((dayItem, index) => (
           <View key={index}>
-            <Text style={styles.dayText}>{dayItem.day}</Text>
-            {dayItem.destinations.map((dest, idx) => (
+            <Text style={styles.dayText}>
+              Day {index + 1} - {dayItem.date}
+            </Text>
+            {dayItem.activities?.map((activity, idx) => (
               <View key={idx} style={styles.destinationCard}>
-                <Image source={{ uri: dest.image }} style={styles.image} />
+                <Image source={activity.imagePath} style={styles.image} />
                 <View style={styles.destinationContent}>
-                  <Text style={styles.destinationTitle}>{dest.title}</Text>
-                  <Text style={styles.timeSlot}>{dest.timeSlot}</Text>
-                  <Text style={styles.destinationDetail}>• {dest.distance}</Text>
-                  <Text style={styles.destinationDetail}>• {dest.duration}</Text>
-                  <Text style={styles.linkText}>more details</Text>
+                  <Text style={styles.destinationTitle}>{activity.place}</Text>
+                  <Text style={styles.timeSlot}>{activity.time}</Text>
+                  <Text style={styles.destinationDetail}>
+                    • Duration: {activity.duration}
+                  </Text>
+                  {activity.distance && (
+                    <Text style={styles.destinationDetail}>
+                      • Distance: {activity.distance}
+                    </Text>
+                  )}
+                  {activity.travelTime && (
+                    <Text style={styles.destinationDetail}>
+                      • Travel Time: {activity.travelTime}
+                    </Text>
+                  )}
+                  <TouchableOpacity
+                    onPress={() => openDetails(dayItem, activity)}
+                  >
+                    <Text style={styles.linkText}>more details</Text>
+                  </TouchableOpacity>
                 </View>
               </View>
             ))}
           </View>
         ))}
+
+        <TouchableOpacity
+          style={styles.estimateBudgetButton}
+          onPress={openBudgetModal}
+        >
+          <Text style={styles.shareText}>Estimated Budget</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+          <Text style={styles.shareText}>Share</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.genButton} onPress={handlegenRoute}>
+          <Text style={styles.shareText}>Generate Route</Text>
+        </TouchableOpacity>
       </ScrollView>
 
-      <TouchableOpacity style={styles.shareButton}>
-        <Text style={styles.shareText}>Share</Text>
-      </TouchableOpacity>
+      {/* Details Modal */}
+      <Modal visible={modalVisible} animationType="fade" transparent={true}>
+        <View style={styles.modalOverlay}>
+          {selectedDay && selectedActivity && (
+            <TripDayDetails
+              dayData={selectedDay}
+              activity={selectedActivity}
+              weather={tripPlan?.weatherSummary?.[selectedDay?.date]}
+              onClose={closeDetails}
+            />
+          )}
+        </View>
+      </Modal>
+
+      {/* Budget Modal */}
+      <EstimatedBudgetModal
+        visible={budgetModalVisible}
+        onClose={closeBudgetModal}
+        budget={tripPlan?.estimatedBudget}
+      />
     </View>
   );
 };
@@ -84,7 +198,7 @@ const PlanByAIScreen = ({ navigation  }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#131c3b',
+    backgroundColor: "#131c3b",
     paddingHorizontal: 16,
     paddingTop: 40,
   },
@@ -92,39 +206,39 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 10,
   },
   headerTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
   },
   sectionTitle: {
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
-    color: '#333',
+    color: "#333",
   },
   text: {
     fontSize: 14,
     marginBottom: 4,
-    color: '#444',
+    color: "#444",
   },
   dayText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 10,
   },
   destinationCard: {
-    flexDirection: 'row',
-    backgroundColor: '#fff',
+    flexDirection: "row",
+    backgroundColor: "#fff",
     borderRadius: 12,
     padding: 10,
     marginBottom: 12,
@@ -139,44 +253,61 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   destinationTitle: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 14,
     marginBottom: 4,
-    color: '#000',
+    color: "#000",
   },
   timeSlot: {
-    backgroundColor: '#e3e7ff',
-    color: '#2a41e8',
+    backgroundColor: "#e3e7ff",
+    color: "#2a41e8",
     paddingVertical: 2,
     paddingHorizontal: 6,
     fontSize: 12,
     borderRadius: 6,
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     marginBottom: 6,
   },
   destinationDetail: {
     fontSize: 12,
-    color: '#555',
+    color: "#555",
   },
   linkText: {
     fontSize: 12,
-    color: '#2a41e8',
+    color: "#2a41e8",
     marginTop: 4,
   },
   shareButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 16,
-    right: 16,
-    backgroundColor: '#5d65f3',
+    top: 20,
+    backgroundColor: "#5d65f3",
     borderRadius: 10,
     paddingVertical: 14,
-    alignItems: 'center',
+    alignItems: "center",
+  },
+  genButton: {
+    top: 30,
+    backgroundColor: "#5d65f3",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+  },
+  estimateBudgetButton: {
+    top: 10,
+    backgroundColor: "#5d65f3",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
   },
   shareText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.56)",
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

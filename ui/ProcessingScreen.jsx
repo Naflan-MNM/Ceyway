@@ -12,8 +12,7 @@ const ProcessingScreen = ({ navigation }) => {
   }, []); */
  /* just for testing */
  const handleCancel = () => {
-   /* navigation.goBack(); */
-   navigation.navigate('PlanByAIScreen');
+   navigation.goBack();
  };
     
   return (
