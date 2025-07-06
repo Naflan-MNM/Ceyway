@@ -5,14 +5,77 @@ import CustomPageHeader from '../components/CustomPageHeader';
 import ItemCard from '../components/ItemCard';
 import FooterNavigation from '../components/FooterNavigation';
 
+/*                                              
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+no in use 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
+
 const CustomPlanePage = ({ navigation }) => {
-    const { jaffnaData, selectedItems, toggleSelection } = useContext(CeywayContext);
+    const { destinationData, selectedItems, toggleSelection } = useContext(CeywayContext);
 
     return (
         <SafeAreaView style={styles.container}>
             <CustomPageHeader />
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
-                {jaffnaData.map((item) => (
+                {destinationData.map((item) => (
                     <ItemCard 
                         key={item.id} 
                         data={item} 

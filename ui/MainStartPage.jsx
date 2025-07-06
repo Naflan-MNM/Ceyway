@@ -1,13 +1,92 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import StartPage2 from './StartPage2';
-import FooterNavigation from '../components/FooterNavigation';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import DestinationsScreen from "./DestinationsScreen";
+import FooterNavigation from "../components/FooterNavigation";
 
+/* 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+not in use 
+not in use
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ */
 const MainStartPage = ({ navigation }) => {
   return (
     <View style={styles.container}>
-        <StartPage2 navigation={navigation}/>
-        <View style={styles.footer}>
+      <DestinationsScreen navigation={navigation} />
+      <View style={styles.footer}>
         <FooterNavigation navigation={navigation} />
       </View>
     </View>
@@ -16,15 +95,15 @@ const MainStartPage = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
-    backgroundColor: '#f8f9fa', 
+    flex: 1,
+    backgroundColor: "#f8f9fa",
   },
   footer: {
-    height: 60, 
-    backgroundColor: '#ffffff', 
-    borderTopWidth: 1, 
-    borderColor: '#ddd', 
-    justifyContent: 'center',
+    height: 60,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 1,
+    borderColor: "#ddd",
+    justifyContent: "center",
   },
 });
 
